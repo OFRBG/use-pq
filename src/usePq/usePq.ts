@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import produce from 'immer'
 import set from 'lodash.set'
 import get from 'lodash.get'
 import { makeProxy } from './makeProxy'
@@ -21,10 +20,8 @@ export function usePq(
       return query.current
     }
 
-    query.current = produce(query.current, (draft) => {
-      const graphqlPath = path.replace(/_\[\]/gm, '')
-      set(draft, graphqlPath, '#')
-    })
+    const graphqlPath = path.replace(/_\[\]/gm, '')
+    set(query.current, graphqlPath, '#')
 
     return query.current
   }
