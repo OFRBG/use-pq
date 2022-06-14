@@ -20,8 +20,10 @@ export function makeProxy(value: unknown, path: Path, updateQuery) {
 
   return new Proxy(virtualProp, {
     get: (target, prop) => {
-      if (prop === 'value') {
+      if (prop === 'get') {
         updateQuery(target.path)
+
+        return target.value
       }
 
       if (prop in target) {

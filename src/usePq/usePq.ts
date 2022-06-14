@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import set from 'lodash.set'
 import get from 'lodash.get'
 import { makeProxy } from './makeProxy'
@@ -14,6 +14,7 @@ export function usePq(
 ) {
   const query = useRef({})
   const [data, setData] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const updateQuery = (path: Path) => {
     if (get(query.current, path) === '#') {
@@ -26,12 +27,19 @@ export function usePq(
     return query.current
   }
 
+  useLayoutEffect(() => {
+    setIsLoading(data === null)
+  })
+
   useEffect(() => {
-    handler(parseQuery(query.current), setData)
+    setTimeout(() => {
+      handler(parseQuery(query.current), setData)
+    }, 0)
   })
 
   return [
     makeProxy(data, 'query', updateQuery),
     parseQuery(query.current),
+    isLoading,
   ] as const
 }
