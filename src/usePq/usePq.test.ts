@@ -1,5 +1,5 @@
 import { vi, test, afterEach, expect, describe } from 'vitest'
-import { renderHook, act } from '@testing-library/react-hooks'
+import { renderHook, act } from '@testing-library/react-hooks/pure'
 import { usePq } from './usePq'
 
 afterEach(() => {
