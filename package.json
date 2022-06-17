@@ -7,6 +7,9 @@
   "author": "Oscar Fonseca <oscar.fonseca@formidable.com>",
   "license": "MIT",
   "type": "module",
+  "publishConfig": {
+    "@OFRBG:registry": "https://npm.pkg.github.com"
+  },
   "files": [
     "dist"
   ],
