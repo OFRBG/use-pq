@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "pqrs",
+  "name": "use-pq",
   "version": "0.0.8",
   "description": "Query-less GraphQL",
   "repository": {
