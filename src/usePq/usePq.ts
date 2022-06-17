@@ -2,40 +2,35 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import set from 'lodash.set'
 import get from 'lodash.get'
 import { makeProxy } from './makeProxy'
-import type { Path } from './makeProxy'
+import { Path } from './VirtualProperty'
 
-const parseQuery = (q: object) =>
-  JSON.stringify(q, null, 2)
-    .replace(/[":,#_]|\{\}/gm, '')
+const parseQuery = (q: object) => {
+  return JSON.stringify(q, null, 2)
+    .replace(/[":](?![^(]*\))|[,#_\\]|\{\}/gm, '')
     .slice(1, -1)
+}
 
 export function usePq(
-  handler: (query: string, setResult: (payload: any) => void) => void
+  handler: (query: string, setResult: (payload: any) => void) => Promise<void>
 ) {
   const query = useRef({})
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const updateQuery = (path: Path) => {
-    if (get(query.current, path) === '#') {
-      return query.current
-    }
+    if (!path) return
+    if (get(query, path) === '#') return query
 
-    const graphqlPath = path.replace(/_\[\]/gm, '')
-    set(query.current, graphqlPath, '#')
-
-    return query.current
+    set(query.current, path.replace(/_\[\]/gm, ''), '#')
   }
 
   useLayoutEffect(() => {
-    setIsLoading(data === null)
-  })
+    setIsLoading(data === null && Object.keys(query).length !== 0)
+  }, [setIsLoading, data])
 
   useEffect(() => {
-    setTimeout(() => {
-      handler(parseQuery(query.current), setData)
-    }, 0)
-  })
+    handler(parseQuery(query.current), setData)
+  }, [handler])
 
   return [
     makeProxy(data, 'query', updateQuery),

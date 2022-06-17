@@ -1,22 +1,14 @@
-export type Path = string
+import { Path, EMPTY_VALUE, VirtualProperty } from './VirtualProperty'
 
-export type VirtualObject = {
-  value: () => any
-  path: Path
-} | null
+const isArrayProp = (prop: Path) =>
+  prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
 
-const EMPTY_VALUE = null
-
-const isArrayProp = (prop: Path) => prop.charAt(prop.length - 1) === '_'
-
-export function makeProxy(value: unknown, path: Path, updateQuery) {
-  const virtualProp = {
-    path,
-    value: () => value || EMPTY_VALUE,
-    get [Symbol.toStringTag]() {
-      return 'VirtualProperty'
-    },
-  }
+export function makeProxy(
+  value: VirtualProperty | null,
+  path: Path,
+  updateQuery
+) {
+  const virtualProp = new VirtualProperty(value, path)
 
   return new Proxy(virtualProp, {
     get: (target, prop) => {
@@ -36,7 +28,10 @@ export function makeProxy(value: unknown, path: Path, updateQuery) {
 
       const path = `${target.path}.${prop}`
 
-      const parsedProp = isArrayProp(prop) ? prop.slice(0, -1) : prop
+      const parsedProp = isArrayProp(prop)
+        ? prop.slice(0, -1)
+        : prop.replace(/\(.*\)/gm, '')
+
       const requestedValue = target?.value()?.[parsedProp]
 
       if (isArrayProp(prop)) {

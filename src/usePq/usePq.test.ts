@@ -1,4 +1,4 @@
-import { vi, test, afterEach, expect } from 'vitest'
+import { vi, test, afterEach, expect, describe } from 'vitest'
 import { renderHook, act } from '@testing-library/react-hooks'
 import { usePq } from './usePq'
 
@@ -6,20 +6,46 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-const handleQuery = (query, setResult) => {
-  setTimeout(() => setResult({ field: { subfield: 'test' } }), 0)
-}
+describe('usePq', () => {
+  test('field fetching', async () => {
+    const handleQuery = (query, setResult) => {
+      setTimeout(() => setResult({ field: { subfield: 'test' } }), 0)
+    }
 
-test('usePq', async () => {
-  const mock = vi.fn().mockImplementation(handleQuery)
-  const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
 
-  act(() => {
-    result.current[0].field.subfield.value()
+    act(() => {
+      result.current[0].field.subfield.get()
+    })
+
+    await waitForNextUpdate()
+
+    expect(mock).toHaveBeenCalled()
+    expect(result.current[0].field.subfield.get()).toBe('test')
   })
 
-  await waitForNextUpdate()
+  test('array fetching', async () => {
+    const handleQuery = (query, setResult) => {
+      setTimeout(
+        () =>
+          setResult({ field: { subfield: [{ leaf: '1' }, { leaf: '2' }] } }),
+        0
+      )
+    }
 
-  expect(mock).toHaveBeenCalled()
-  expect(result.current[0].field.subfield.value()).toBe('test')
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
+
+    const list = result.current[0].field.subfield_
+
+    act(() => {
+      list.map((entry) => entry.leaf.get())
+    })
+
+    await waitForNextUpdate()
+
+    expect(mock).toHaveBeenCalled()
+    expect(result.current[0].field.subfield_[0].leaf.get()).toBe('1')
+  })
 })

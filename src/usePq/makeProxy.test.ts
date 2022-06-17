@@ -13,12 +13,12 @@ describe('makeProxy', () => {
     const proxy = makeProxy(null, 'query', () => {})
 
     expect(proxy.virtual.path).toBe('query.virtual')
-    expect(proxy.virtual.value()).toBe(null)
+    expect(proxy.virtual.get()).toBe(null)
   })
 
   it('returns real values', () => {
-    const proxy = makeProxy({ virtual: 'real' }, 'query', () => {})
+    const proxy = makeProxy({ virtual: 'real' } as any, 'query', () => {})
 
-    expect(proxy.virtual.value()).toBe('real')
+    expect(proxy.virtual.get()).toBe('real')
   })
 })
