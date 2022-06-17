@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@ofrbg/pqrs",
+  "name": "pqrs",
   "version": "0.0.5",
   "description": "Query-less GraphQL",
   "repository": {
