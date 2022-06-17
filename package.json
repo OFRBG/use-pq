@@ -1,9 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "pqrs",
+  "name": "@ofrbg/pqrs",
   "version": "0.0.1",
   "description": "Query-less GraphQL",
-  "repository": "https://github.com/OFRBG/pqrs.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OFRBG/pqrs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OFRBG/pqrs/issues"
+  },
+  "homepage": "https://github.com/OFRBG/pqrs#readme",
   "author": "Oscar Fonseca <oscar.fonseca@formidable.com>",
   "license": "MIT",
   "type": "module",
