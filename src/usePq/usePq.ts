@@ -32,9 +32,7 @@ const updateQuery =
     set(query.current, path.replace(/_\[\]/gm, ''), '#')
   }
 
-export function usePq(
-  handler: (query: string, setResult: (payload: any) => void) => Promise<void>
-) {
+export function usePq(handler: (query: string) => Promise<void>) {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState(
@@ -44,16 +42,20 @@ export function usePq(
   const [isLoading, setIsLoading] = useState(false)
 
   useLayoutEffect(() => {
-    setIsLoading(data === null && Object.keys(queryRef).length !== 0)
-  }, [setIsLoading, data])
-
-  useEffect(() => {
-    handler(query, setData)
-  }, [handler, query])
+    setIsLoading(data === null && Object.keys(queryRef.current).length > 0)
+  })
 
   useEffect(() => {
     setQuery(parseQuery(queryRef.current))
   })
+
+  useEffect(() => {
+    setData(null)
+  }, [query])
+
+  useEffect(() => {
+    query && handler(query).then(setData)
+  }, [handler, query])
 
   useEffect(() => {
     setProxy(makeProxy(data, 'query', updateQuery(queryRef)))
