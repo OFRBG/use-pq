@@ -3,6 +3,9 @@ import { Path, EMPTY_VALUE, VirtualProperty } from './VirtualProperty'
 const isArrayProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
 
+const parseProp = (prop: string) =>
+  (isArrayProp(prop) ? prop.slice(0, -1) : prop).replace(/\(.*\)/gm, '')
+
 export function makeProxy(
   value: VirtualProperty | null,
   path: Path,
@@ -27,11 +30,7 @@ export function makeProxy(
       }
 
       const path = `${target.path}.${prop}`
-
-      const parsedProp = isArrayProp(prop)
-        ? prop.slice(0, -1)
-        : prop.replace(/\(.*\)/gm, '')
-
+      const parsedProp = parseProp(prop)
       const requestedValue = target?.value()?.[parsedProp]
 
       if (isArrayProp(prop)) {

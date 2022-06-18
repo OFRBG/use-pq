@@ -6,7 +6,7 @@ import { Path } from './VirtualProperty'
 
 const parseQuery = (q: object) => {
   return JSON.stringify(q, null, 2)
-    .replace(/[":](?![^(]*\))|[,#_\\]|\{\}/gm, '')
+    .replace(/[":,](?![^(]*\))|[#_\\]|\{\}/gm, '')
     .slice(1, -1)
 }
 
