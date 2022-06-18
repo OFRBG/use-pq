@@ -9,6 +9,12 @@ export type VirtualObjectInternals = {
   path: Path
 }
 
+export type VirtualObject<T extends object> = {
+  [key in keyof T]: {
+    get: () => T[key]
+  }
+}
+
 export class VirtualProperty implements VirtualObjectInternals {
   constructor(private _value: unknown, public path: string) {}
 
