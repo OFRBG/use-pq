@@ -31,12 +31,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm i -g pnpm
       - run: pnpm i --frozen-lockfile
-      - run: pnpm publish --no-git-checks
+      - run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - uses: actions/setup-node@v3
-        with:
-          registry-url: 'https://npm.pkg.github.com'
-      - run: pnpm publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
