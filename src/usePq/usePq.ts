@@ -1,6 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  MutableRefObject,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import set from 'lodash.set'
-import get from 'lodash.get'
 import { makeProxy } from './makeProxy'
 import { Path } from './VirtualProperty'
 
@@ -10,31 +15,49 @@ const parseQuery = (q: object) => {
     .slice(1, -1)
 }
 
-export function usePq(
-  handler: (query: string, setResult: (payload: any) => void) => Promise<void>
-) {
-  const query = useRef({})
-  const [data, setData] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const updateQuery = (path: Path) => {
+const updateQuery =
+  (query: MutableRefObject<{ query?: any }>) => (path: Path) => {
     if (!path) return
-    if (get(query, path) === '#') return query
+
+    const [, incomingRoot] = path.split('.')
+    const currentRoot = Reflect.ownKeys(query.current.query || {})[0]
+
+    if (
+      Boolean(Reflect.ownKeys(query.current.query || {}).length) &&
+      incomingRoot !== currentRoot
+    ) {
+      query.current = {}
+    }
 
     set(query.current, path.replace(/_\[\]/gm, ''), '#')
   }
 
+export function usePq(
+  handler: (query: string, setResult: (payload: any) => void) => Promise<void>
+) {
+  const queryRef = useRef({})
+  const [query, setQuery] = useState('')
+  const [proxy, setProxy] = useState(
+    makeProxy(null, 'query', updateQuery(queryRef))
+  )
+  const [data, setData] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+
   useLayoutEffect(() => {
-    setIsLoading(data === null && Object.keys(query).length !== 0)
+    setIsLoading(data === null && Object.keys(queryRef).length !== 0)
   }, [setIsLoading, data])
 
   useEffect(() => {
-    handler(parseQuery(query.current), setData)
-  }, [handler])
+    handler(query, setData)
+  }, [handler, query])
 
-  return [
-    makeProxy(data, 'query', updateQuery),
-    parseQuery(query.current),
-    isLoading,
-  ] as const
+  useEffect(() => {
+    setQuery(parseQuery(queryRef.current))
+  })
+
+  useEffect(() => {
+    setProxy(makeProxy(data, 'query', updateQuery(queryRef)))
+  }, [data, query])
+
+  return [proxy, query, isLoading] as const
 }

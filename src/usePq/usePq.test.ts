@@ -7,6 +7,9 @@ afterEach(() => {
 })
 
 describe('usePq', () => {
+  const getArgField = (id) => `field(id: "${id}", first: 2)`
+  const makeFieldArray = (field) => field + '_'
+
   test('field fetching', async () => {
     const handleQuery = (query, setResult) => {
       setTimeout(() => setResult({ field: { subfield: 'test' } }), 0)
@@ -15,9 +18,7 @@ describe('usePq', () => {
     const mock = vi.fn().mockImplementation(handleQuery)
     const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
 
-    act(() => {
-      result.current[0].field.subfield.get()
-    })
+    result.current[0].field.subfield.get()
 
     await waitForNextUpdate()
 
@@ -39,9 +40,7 @@ describe('usePq', () => {
 
     const list = result.current[0].field.subfield_
 
-    act(() => {
-      list.map((entry) => entry.leaf.get())
-    })
+    list.map((entry) => entry.leaf.get())
 
     await waitForNextUpdate()
 
@@ -56,17 +55,14 @@ describe('usePq', () => {
 
     const mock = vi.fn().mockImplementation(handleQuery)
     const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
-    const argField = `field(id: "1")`
 
-    act(() => {
-      result.current[0][argField].subfield.id.get()
-    })
+    result.current[0][getArgField(1)].subfield.get()
 
     await waitForNextUpdate()
 
     expect(mock).toHaveBeenCalled()
     expect(result.current[0].field.subfield.id.get()).toBe(1)
-    expect(result.current[1]).toContain(argField)
+    expect(result.current[1]).toContain(getArgField(1))
   })
 
   test('list query parameters', async () => {
@@ -79,18 +75,56 @@ describe('usePq', () => {
 
     const mock = vi.fn().mockImplementation(handleQuery)
     const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
-    const argField = `field(id: "1", first: 2)_`
 
-    const list = result.current[0][argField]
+    const list = result.current[0][makeFieldArray(getArgField(1))]
 
-    act(() => {
-      list.map((entry) => entry.subfield.get())
-    })
+    list.map((entry) => entry.subfield.get())
 
     await waitForNextUpdate()
 
     expect(mock).toHaveBeenCalled()
-    expect(result.current[0][argField][0].subfield.get()).toBe(1)
-    expect(result.current[1]).toContain(argField.slice(0, -1))
+    expect(
+      result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
+    ).toBe(1)
+    expect(result.current[1]).toEqual(expect.stringContaining(getArgField(1)))
+  })
+
+  test.only('duplicate queries', async () => {
+    const handleQuery = async (query, setResult) => {
+      setTimeout(() => {
+        setResult({ field: [{ subfield: 1 }, { subfield: 2 }] })
+      }, 0)
+    }
+
+    let list
+
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
+
+    list = result.current[0][makeFieldArray(getArgField('first'))]
+    list.map((entry) => entry.subfield.get())
+    list.map((entry) => entry.meta.id.get())
+
+    await waitForNextUpdate()
+
+    list = result.current[0][makeFieldArray(getArgField('second'))]
+    list.map((entry) => entry.subfield.get())
+    list.map((entry) => entry.meta.id.get())
+
+    await waitForNextUpdate()
+
+    expect(mock).toHaveBeenCalledTimes(3)
+    expect(mock).toHaveBeenNthCalledWith(1, '', expect.anything())
+    expect(mock).toHaveBeenNthCalledWith(
+      2,
+      expect.stringContaining(getArgField('first')),
+      expect.anything()
+    )
+    expect(mock).toHaveBeenNthCalledWith(
+      3,
+      expect.stringContaining(getArgField('second')),
+      expect.anything()
+    )
+    expect(result.current[1]).toContain(getArgField('second'))
   })
 })
