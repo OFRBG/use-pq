@@ -89,7 +89,7 @@ describe('usePq', () => {
     expect(result.current[1]).toEqual(expect.stringContaining(getArgField(1)))
   })
 
-  test.only('duplicate queries', async () => {
+  test('duplicate queries', async () => {
     const handleQuery = async (query, setResult) => {
       setTimeout(() => {
         setResult({ field: [{ subfield: 1 }, { subfield: 2 }] })
