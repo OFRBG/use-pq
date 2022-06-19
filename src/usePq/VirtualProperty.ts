@@ -10,9 +10,7 @@ export type VirtualObjectInternals = {
 }
 
 export type VirtualObject<T extends object> = {
-  [key in keyof T]: {
-    get: () => T[key]
-  }
+  [key in keyof T]: any
 }
 
 export class VirtualProperty implements VirtualObjectInternals {
@@ -28,6 +26,10 @@ export class VirtualProperty implements VirtualObjectInternals {
 
   [Symbol.toPrimitive]() {
     return this.value()
+  }
+
+  *[Symbol.iterator]() {
+    yield this.value()
   }
 
   toString() {

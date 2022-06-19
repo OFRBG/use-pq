@@ -1,12 +1,12 @@
-import { vi, test, afterEach, expect, describe } from 'vitest'
+/// <reference types="vitest/globals" />
 import { renderHook } from '@testing-library/react-hooks'
 import { usePq } from './usePq'
 
-afterEach(() => {
-  vi.clearAllMocks()
-})
-
 describe('usePq', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
   const getArgField = (id: string | number) => `field(id: "${id}", first: 2)`
   const makeFieldArray = (field: string) => field + '_'
 

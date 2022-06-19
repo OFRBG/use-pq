@@ -15,9 +15,15 @@ export function makeProxy(
 
   return new Proxy(virtualProp, {
     get: (target, prop) => {
-      if (prop === 'get') {
+      if (
+        prop === 'get' ||
+        prop === Symbol.toPrimitive ||
+        prop === Symbol.iterator
+      ) {
         updateQuery(target.path)
+      }
 
+      if (prop === 'get') {
         return target.value
       }
 

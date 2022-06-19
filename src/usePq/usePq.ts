@@ -32,7 +32,7 @@ const updateQuery =
     set(query.current, path.replace(/_\[\]/gm, ''), '#')
   }
 
-export function usePq(handler: (query: string) => Promise<void>) {
+export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState(

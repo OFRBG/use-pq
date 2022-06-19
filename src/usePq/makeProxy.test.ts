@@ -1,4 +1,4 @@
-import { it, describe, expect } from 'vitest'
+/// <reference types="vitest/globals" />
 import { makeProxy } from './makeProxy'
 
 describe('makeProxy', () => {
