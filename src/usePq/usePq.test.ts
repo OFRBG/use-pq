@@ -78,6 +78,27 @@ describe('usePq', () => {
     expect(result.current[1]).toContain(getArgField(1))
   })
 
+  test('function query parameters', async () => {
+    const handleQuery = async (query) => {
+      return query ? { field: { subfield: 'test' } } : null
+    }
+
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { rerender, result, waitForNextUpdate } = renderHook(() =>
+      usePq(mock)
+    )
+
+    result.current[0].field.$params({ id: '1' }).subfield.get()
+
+    rerender()
+    expect(result.current[2]).toBe(true)
+    await waitForNextUpdate()
+
+    expect(result.current[2]).toBe(false)
+    expect(mock).toHaveBeenCalled()
+    expect(result.current[0].field.subfield.get()).toBe('test')
+  })
+
   test('list query parameters', async () => {
     const handleQuery = async (query) => {
       return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null

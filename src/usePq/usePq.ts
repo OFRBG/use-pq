@@ -7,19 +7,22 @@ import {
 } from 'react'
 import set from 'lodash.set'
 import { makeProxy } from './makeProxy'
-import { Path } from './VirtualProperty'
+import { Path, VirtualObject, VirtualProperty } from './VirtualProperty'
 
 const parseQuery = (q: object) => {
   return JSON.stringify(q, null, 2)
-    .replace(/[":,](?![^(]*\))|[#_\\]|\{\}/gm, '')
-    .slice(1, -1)
+    .replace(/[":,](?![^(]*\))/gm, '')
+    .replace(/[#_\\]/gm, '')
+    .replace(/\{\}/gm, '')
+    .replace(/^\s\s/gm, '')
+    .slice(2, -2)
 }
 
 const updateQuery =
-  (query: MutableRefObject<{ query?: any }>) => (path: Path) => {
-    if (!path) return
+  (query: MutableRefObject<{ query?: any }>) => (target: VirtualProperty) => {
+    if (!target.path) return
 
-    const [, incomingRoot] = path.split('.')
+    const [, incomingRoot] = target.path.split('.')
     const currentRoot = Reflect.ownKeys(query.current.query || {})[0]
 
     if (
@@ -29,14 +32,14 @@ const updateQuery =
       query.current = {}
     }
 
-    set(query.current, path.replace(/_\[\]/gm, ''), '#')
+    set(query.current, target.path, '#')
   }
 
 export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState(
-    makeProxy(null, 'query', updateQuery(queryRef))
+    makeProxy(null, 'query', 'query', null, updateQuery(queryRef))
   )
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -58,7 +61,7 @@ export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   }, [handler, query])
 
   useEffect(() => {
-    setProxy(makeProxy(data, 'query', updateQuery(queryRef)))
+    setProxy(makeProxy(data, 'query', 'query', null, updateQuery(queryRef)))
   }, [data, query])
 
   return [proxy, query, isLoading] as const

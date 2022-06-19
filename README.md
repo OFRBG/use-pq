@@ -16,7 +16,7 @@ export function UserStatus() {
   // Access and build any reference from p
   const user = p.session.user
 
-  const displayName = `${user.title.get()} ${user.name.get()}`
+  const displayName = `${user.title} ${user.name}`
 
   return (
     <div>
@@ -24,7 +24,7 @@ export function UserStatus() {
         <span>loading...</span>
       ) : (
         <span>
-          {displayName}: {user.status.get()}
+          {displayName}: {user.status}
         </span>
       )}
     </div>
@@ -47,7 +47,7 @@ export function UserStatus() {
 A Proxy that captures the values that are needed during the first render phase.
 
 ### q
-The query that was built from the render phase from accessing `.get()` properties.
+The query that was built from the render phase from accessing `` properties. If the field was accessed by React during rendering, it will also be registered.
 
 ### isLoading
 The state of the field capture phase. This is `true` while a query does not exist and the client has not set any data.
@@ -75,7 +75,11 @@ export function Users() {
         // with isLoading = true after capturing
         <span>loading...</span>
       ) : (
-        users.map(({ name }) => <span>{user.get()}</span>)
+        // React will attempt to render name by checking if
+        // if it a valid element. When an object is being verified,
+        // React checks if it has Symbol.iterator. When the iterator
+        // property is accessed, the field is registered for the query.
+        users.map(({ name }) => <span>{name}</span>)
       )}
     </div>
   )
@@ -97,7 +101,7 @@ export function User({ id }) {
       {isLoading ? (
         <span>loading...</span>
       ) : (
-        <span>{id.get()}: {name.get()}</span>
+        <span>{id}: {name}</span>
       )}
     </div>
   )
@@ -112,7 +116,7 @@ export function UsersLimit({ limit }) {
   const [p, q, isLoading] = usePq(handler)
 
   const users = p[`users(limit: ${limit})_`].map(({id, name}) => (
-    `${id.get()}: ${name.get()}`
+    `${id}: ${name}`
   ))
 
   return (
