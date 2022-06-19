@@ -1,7 +1,11 @@
-import { C } from 'ts-toolbelt'
-import { Path, EMPTY_VALUE, VirtualProperty } from './VirtualProperty'
+import {
+  EMPTY_VALUE,
+  Path,
+  VirtualProperty,
+  ResolvedValue,
+} from './VirtualProperty'
 
-const isArrayProp = (prop: Path) =>
+const isListProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
 
 const isParamProp = (prop: Path) =>
@@ -14,7 +18,22 @@ const parseProp = (prop: string): [string, string, string] => {
   return [queryProp, params, '']
 }
 
-const buildArgs = (args) => {
+const getNestedProxy = (
+  prop: string,
+  value: ResolvedValue | ResolvedValue[],
+  path: string,
+  updateQuery: (target: VirtualProperty) => void
+) => {
+  if (isListProp(prop)) {
+    return ((value as ResolvedValue[] | null) || [EMPTY_VALUE]).map((entry) =>
+      makeProxy(entry, path, updateQuery)
+    )
+  }
+
+  return makeProxy(value as ResolvedValue | null, path, updateQuery)
+}
+
+const getArgsString = (args: object) => {
   let argString = '('
 
   for (let key in args) {
@@ -39,13 +58,11 @@ const buildArgs = (args) => {
 }
 
 export function makeProxy(
-  value: VirtualProperty | null,
-  prop: string,
+  value: ResolvedValue | typeof EMPTY_VALUE,
   path: Path,
-  params: string,
-  updateQuery
+  updateQuery: (target: VirtualProperty) => void
 ) {
-  const virtualProp = new VirtualProperty({ prop, value, path, params })
+  const virtualProp = new VirtualProperty({ value, path })
 
   return new Proxy(virtualProp, {
     get: (target, prop) => {
@@ -70,37 +87,20 @@ export function makeProxy(
       }
 
       const [parsedProp, params] = parseProp(prop)
-      const requestedValue = target?.value()?.[parsedProp]
+      const requestedValue = target.value()?.[parsedProp]
       const path = `${target.path}.${parsedProp}`
 
       if (isParamProp(prop)) {
-        return (params) => {
-          const args = buildArgs(params)
-          const parentValue = target?.value()
-
-          if (isArrayProp(prop)) {
-            return (parentValue || [EMPTY_VALUE]).map((entry) =>
-              makeProxy(entry, prop, target.path + args, params, updateQuery)
-            )
-          }
-
-          return makeProxy(
-            target?.value(),
+        return (params: object) =>
+          getNestedProxy(
             prop,
-            target.path + args,
-            args,
+            target.value(),
+            target.path + getArgsString(params),
             updateQuery
           )
-        }
       }
 
-      if (isArrayProp(prop)) {
-        return (requestedValue || [EMPTY_VALUE]).map((entry) =>
-          makeProxy(entry, prop, path + params, params, updateQuery)
-        )
-      }
-
-      return makeProxy(requestedValue, prop, path + params, params, updateQuery)
+      return getNestedProxy(prop, requestedValue, path + params, updateQuery)
     },
   })
 }

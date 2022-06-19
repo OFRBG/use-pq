@@ -1,33 +1,39 @@
-import { Union } from 'ts-toolbelt'
-
-export const EMPTY_VALUE = null
+export const EMPTY_VALUE: null = null
 
 export type Path = string | typeof EMPTY_VALUE
 
-export type VirtualObjectInternals = {
-  value: () => Union.Nullable<VirtualObjectInternals | VirtualObjectInternals[]>
+export type ResolvedValue =
+  | {
+      [key: string]: ResolvedValue | ResolvedValue[]
+    }
+  | string
+  | number
+  | null
+
+export type VirtualPropertyInterface = {
+  [key: string]: any
+} & {
   path: Path
-  params?: any
+  value: () => ResolvedValue
+  get: () => ResolvedValue
 }
 
 export type VirtualObject<T extends object> = {
   [key in keyof T]: any
 }
 
-export class VirtualProperty implements VirtualObjectInternals {
+export class VirtualProperty
+  implements Pick<VirtualPropertyInterface, 'path' | 'value'>
+{
   public path: string
-  public prop: string
-  public params: string
-  private _value: any
+  private _value: ResolvedValue
 
-  constructor(props) {
+  constructor(props: { path: string; value?: ResolvedValue }) {
     this.path = props.path
-    this.prop = props.prop
-    this.params = props.params
     this._value = props.value
   }
 
-  value() {
+  value(): ResolvedValue {
     return this._value || EMPTY_VALUE
   }
 
@@ -44,6 +50,6 @@ export class VirtualProperty implements VirtualObjectInternals {
   }
 
   toString() {
-    return this.value()
+    return this.value().toString()
   }
 }
