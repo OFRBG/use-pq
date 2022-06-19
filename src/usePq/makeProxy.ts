@@ -69,17 +69,23 @@ export function makeProxy(
         throw new Error('Symbol query paths are not supported.')
       }
 
+      const [parsedProp, params] = parseProp(prop)
+      const requestedValue = target?.value()?.[parsedProp]
+      const path = `${target.path}.${parsedProp}`
+
       if (isParamProp(prop)) {
         return (params) => {
           const args = buildArgs(params)
 
-          return makeProxy(target, prop, target.path + args, args, updateQuery)
+          return makeProxy(
+            target?.value(),
+            prop,
+            target.path + args,
+            args,
+            updateQuery
+          )
         }
       }
-
-      const [parsedProp, params] = parseProp(prop)
-      const requestedValue = target?.value()?.[parsedProp]
-      const path = `${target.path}.${parsedProp}`
 
       if (isArrayProp(prop)) {
         return (requestedValue || [EMPTY_VALUE]).map((entry) =>
