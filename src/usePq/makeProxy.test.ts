@@ -29,7 +29,7 @@ describe('makeProxy', () => {
     expect(proxy.virtual.get()).toBe('real')
   })
 
-  it.only('creates argument functions', () => {
+  it('creates argument functions', () => {
     const proxy = makeProxy(null, 'query', 'query', null, () => {})
 
     proxy.virtual.$params({ a: 1 }).subfield.get()
