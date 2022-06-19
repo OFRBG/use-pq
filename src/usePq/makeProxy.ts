@@ -76,6 +76,13 @@ export function makeProxy(
       if (isParamProp(prop)) {
         return (params) => {
           const args = buildArgs(params)
+          const parentValue = target?.value()
+
+          if (isArrayProp(prop)) {
+            return (parentValue || [EMPTY_VALUE]).map((entry) =>
+              makeProxy(entry, prop, target.path + args, params, updateQuery)
+            )
+          }
 
           return makeProxy(
             target?.value(),

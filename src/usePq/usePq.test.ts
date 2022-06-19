@@ -125,6 +125,31 @@ describe('usePq', () => {
     expect(result.current[1]).toEqual(expect.stringContaining(getArgField(1)))
   })
 
+  test('list function query parameters', async () => {
+    const handleQuery = async (query) => {
+      return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null
+    }
+
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { rerender, result, waitForNextUpdate } = renderHook(() =>
+      usePq(mock)
+    )
+
+    const list = result.current[0].field.$params_({ id: '1', first: 2 })
+
+    list.map((entry) => entry.subfield.get())
+
+    rerender()
+    expect(result.current[2]).toBe(true)
+    await waitForNextUpdate()
+
+    expect(result.current[2]).toBe(false)
+    expect(mock).toHaveBeenCalled()
+    expect(
+      result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
+    ).toBe(1)
+  })
+
   test('duplicate queries', async () => {
     const handleQuery = async (query) => {
       return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null
