@@ -30,6 +30,8 @@ describe('usePq in render', () => {
     await waitFor(() => {
       expect(screen.getByTestId('target')).toHaveAttribute('data-id', '1')
     })
+
+    expect(mock).toHaveBeenCalledTimes(2)
   })
 
   test('set child', async () => {
@@ -52,6 +54,8 @@ describe('usePq in render', () => {
     await waitFor(() => {
       expect(screen.getByTestId('target').innerHTML).toBe('1')
     })
+
+    expect(mock).toHaveBeenCalledTimes(2)
   })
 
   test('skip field only in render', async () => {
@@ -76,6 +80,6 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target').innerHTML).toBe('')
     })
 
-    expect(mock).not.toHaveBeenCalled()
+    expect(mock).toHaveBeenCalledTimes(1)
   })
 })
