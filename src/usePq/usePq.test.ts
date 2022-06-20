@@ -69,6 +69,7 @@ describe('usePq', () => {
     )
 
     const list = result.current[0].field.on('Tree').subfield_
+    result.current[0].field.on('Forest').subfield.get()
     result.current[0].field.notTree.get()
 
     list.map((entry) => entry.leaf.get())

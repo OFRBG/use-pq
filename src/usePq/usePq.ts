@@ -10,7 +10,9 @@ import { makeProxy } from './makeProxy'
 import { VirtualProperty, VirtualPropertyInterface } from './VirtualProperty'
 
 const parseQuery = (q: object) => {
-  return JSON.stringify(q, null, 2)
+  const json = JSON.stringify(q, null, 2)
+
+  return json
     .replace(/[":,](?![^(]*\))/gm, '')
     .replace(/[#_\\]/gm, '')
     .replace(/\{\}/gm, '')
@@ -18,17 +20,16 @@ const parseQuery = (q: object) => {
     .slice(2, -2)
 }
 
+const getRootField = ({ query = {} }) => Reflect.ownKeys(query)[0]
+
 const updateQuery =
   (query: MutableRefObject<{ query?: any }>) => (target: VirtualProperty) => {
     if (!target.path) return
 
-    const [, incomingRoot] = target.path.split('.')
-    const currentRoot = Reflect.ownKeys(query.current.query || {})[0]
+    const incomingRootField = getRootField(set({}, target.path, '?'))
+    const currentRootField = getRootField(query.current)
 
-    if (
-      Boolean(Reflect.ownKeys(query.current.query || {}).length) &&
-      incomingRoot !== currentRoot
-    ) {
+    if (incomingRootField !== currentRootField) {
       query.current = {}
     }
 
