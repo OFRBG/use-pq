@@ -178,6 +178,32 @@ describe('usePq', () => {
     ).toBe(1)
   })
 
+  test('query variables', async () => {
+    const handleQuery = async (query) => {
+      return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null
+    }
+
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { rerender, result, waitForNextUpdate } = renderHook(() =>
+      usePq(mock)
+    )
+
+    result.current[0]
+      .with({ $episode: 'Episode' })
+      .field.$({ episode: '$episode' })
+      .subfield.get()
+
+    rerender()
+    expect(result.current[2]).toBe(true)
+    await waitForNextUpdate()
+
+    expect(result.current[2]).toBe(false)
+    expect(mock).toHaveBeenCalled()
+    expect(
+      result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
+    ).toBe(1)
+  })
+
   test('duplicate queries', async () => {
     const handleQuery = async (query) => {
       return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null

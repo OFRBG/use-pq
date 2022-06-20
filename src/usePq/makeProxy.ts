@@ -8,10 +8,13 @@ import {
 const isListProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
 
-const isInlineFragment = (prop: Path) => prop !== EMPTY_VALUE && prop === 'on'
+const isInlineFragmentProp = (prop: Path) =>
+  prop !== EMPTY_VALUE && prop === 'on'
 
 const isParamProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(0) === '$'
+
+const isVariableProp = (prop: Path) => prop !== EMPTY_VALUE && prop === 'with'
 
 const parseProp = (prop: string): [string, string, string] => {
   const queryProp = prop.replace(/\(.*\)|_$/gm, '')
@@ -48,10 +51,31 @@ const getArgsString = (args: object) => {
 
     switch (typeof value) {
       case 'string':
-        argString += `'${args[key]}'`
+        argString += args[key].charAt(0) === '$' ? args[key] : `'${args[key]}'`
         break
       case 'number':
         argString += args[key]
+        break
+      default:
+        throw new Error('Unhandled paramter type %s of %s')
+    }
+
+    argString += ','
+  }
+
+  return argString + ')'
+}
+
+const getVariablesString = (args: object) => {
+  let argString = '('
+
+  for (let key in args) {
+    const value = args[key]
+    argString += `${key}: `
+
+    switch (typeof value) {
+      case 'string':
+        argString += `${args[key]}`
         break
       default:
         throw new Error('Unhandled paramter type %s of %s')
@@ -106,7 +130,17 @@ export function makeProxy(
           )
       }
 
-      if (isInlineFragment(prop)) {
+      if (isVariableProp(prop)) {
+        return (params: object) =>
+          getNestedProxy(
+            prop,
+            target.value(),
+            target.path + getVariablesString(params),
+            updateQuery
+          )
+      }
+
+      if (isInlineFragmentProp(prop)) {
         return (type: string) =>
           getNestedProxy(
             prop,
