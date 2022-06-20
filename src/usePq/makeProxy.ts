@@ -8,6 +8,8 @@ import {
 const isListProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
 
+const isInlineFragment = (prop: Path) => prop !== EMPTY_VALUE && prop === 'on'
+
 const isParamProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(0) === '$'
 
@@ -31,6 +33,10 @@ const getNestedProxy = (
   }
 
   return makeProxy(value as ResolvedValue | null, path, updateQuery)
+}
+
+const getFragmentString = (type: string) => {
+  return `["... on ${type}"]`
 }
 
 const getArgsString = (args: object) => {
@@ -96,6 +102,16 @@ export function makeProxy(
             prop,
             target.value(),
             target.path + getArgsString(params),
+            updateQuery
+          )
+      }
+
+      if (isInlineFragment(prop)) {
+        return (type: string) =>
+          getNestedProxy(
+            prop,
+            target.value(),
+            target.path + getFragmentString(type),
             updateQuery
           )
       }

@@ -56,6 +56,33 @@ describe('usePq', () => {
     expect(result.current[0].field.subfield_[0].leaf.get()).toBe('1')
   })
 
+  test('inline fragment polymorphism', async () => {
+    const handleQuery = async (query) => {
+      return query
+        ? { field: { notTree: true, subfield: [{ leaf: '1' }, { leaf: '2' }] } }
+        : null
+    }
+
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { rerender, result, waitForNextUpdate } = renderHook(() =>
+      usePq(mock)
+    )
+
+    const list = result.current[0].field.on('Tree').subfield_
+    result.current[0].field.notTree.get()
+
+    list.map((entry) => entry.leaf.get())
+
+    rerender()
+    expect(result.current[2]).toBe(true)
+    await waitForNextUpdate()
+
+    expect(result.current[2]).toBe(false)
+    expect(mock).toHaveBeenCalled()
+    expect(result.current[0].field.subfield_[0].leaf.get()).toBe('1')
+    expect(result.current[0].field.notTree.get()).toBe(true)
+  })
+
   test('query parameters', async () => {
     const handleQuery = async (query) => {
       return query ? { field: { subfield: { id: 1 } } } : null
