@@ -75,7 +75,7 @@ const getVariablesString = (args: object) => {
 
     switch (typeof value) {
       case 'string':
-        argString += `${args[key]}`
+        argString += args[key]
         break
       default:
         throw new Error('Unhandled paramter type %s of %s')
