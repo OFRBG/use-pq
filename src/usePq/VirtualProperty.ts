@@ -6,6 +6,7 @@ export type ResolvedValue =
   | {
       [key: string]: ResolvedValue | ResolvedValue[]
     }
+  | ResolvedValue[]
   | string
   | number
   | null

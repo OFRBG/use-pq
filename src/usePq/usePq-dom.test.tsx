@@ -1,9 +1,10 @@
 /// <reference types="vitest/globals" />
 import '@testing-library/jest-dom'
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { screen, render, waitFor } from '@testing-library/react'
 import { usePq } from './usePq'
+import { act } from '@testing-library/react-hooks'
 
 describe('usePq in render', () => {
   afterEach(() => {
@@ -81,5 +82,51 @@ describe('usePq in render', () => {
     })
 
     expect(mock).toHaveBeenCalledTimes(1)
+  })
+
+  test('empty arrays', async () => {
+    const handleQuery = (b?) => async (query) => {
+      console.log(b, query)
+      return query ? { a: { b } } : null
+    }
+
+    const mock = vi
+      .fn()
+      .mockImplementationOnce(handleQuery())
+      .mockImplementationOnce(handleQuery([]))
+      .mockImplementationOnce(handleQuery([{ c: 1 }]))
+
+    const component = React.createElement(
+      ({ handler }) => {
+        const [p] = usePq(handler)
+        const [c, setC] = useState(0)
+
+        return (
+          <>
+            <span data-testid="target">
+              {p.a.$({ c }).b_.map(({ c }) => c)}
+            </span>
+            <button data-testid="button" onClick={() => setC(c + 1)}></button>
+          </>
+        )
+      },
+      { handler: mock }
+    )
+
+    render(component)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('target').innerHTML).toBe('')
+    })
+
+    act(() => {
+      screen.getByTestId('button').click()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('target').innerHTML).toBe('1')
+    })
+
+    expect(mock).toHaveBeenCalledTimes(2)
   })
 })
