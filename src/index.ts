@@ -1,2 +1,2 @@
-export { usePq } from './usePq/usePq'
-export { VirtualObject } from './usePq/VirtualProperty'
+export { usePq } from './use-pq/use-pq'
+export { VirtualObject } from './use-pq/virtual-property'

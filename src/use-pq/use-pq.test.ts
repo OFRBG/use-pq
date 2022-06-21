@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
 import { renderHook } from '@testing-library/react-hooks'
-import { usePq } from './usePq'
+import { usePq } from './use-pq'
 
 describe('usePq', () => {
   afterEach(() => {

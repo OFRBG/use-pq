@@ -6,8 +6,8 @@ import {
   useState,
 } from 'react'
 import set from 'lodash.set'
-import { makeProxy } from './makeProxy'
-import { VirtualProperty, VirtualPropertyInterface } from './VirtualProperty'
+import { makeProxy } from './proxy'
+import { VirtualProperty, VirtualPropertyInterface } from './virtual-property'
 
 const parseQuery = (q: object) => {
   const json = JSON.stringify(q, null, 2)

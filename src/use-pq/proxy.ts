@@ -1,27 +1,19 @@
 import {
+  getArgsString,
+  getFragmentString,
+  getVariablesString,
+  isInlineFragmentProp,
+  isListProp,
+  isParamProp,
+  isVariableProp,
+  parseProp,
+} from './property'
+import {
   EMPTY_VALUE,
   Path,
   VirtualProperty,
   ResolvedValue,
-} from './VirtualProperty'
-
-const isListProp = (prop: Path) =>
-  prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
-
-const isInlineFragmentProp = (prop: Path) =>
-  prop !== EMPTY_VALUE && prop === 'on'
-
-const isParamProp = (prop: Path) =>
-  prop !== EMPTY_VALUE && prop.charAt(0) === '$'
-
-const isVariableProp = (prop: Path) => prop !== EMPTY_VALUE && prop === 'with'
-
-const parseProp = (prop: string): [string, string, string] => {
-  const queryProp = prop.replace(/\(.*\)|_$/gm, '')
-  const params = prop.match(/\((.*)\)/)?.[0] || ''
-
-  return [queryProp, params, '']
-}
+} from './virtual-property'
 
 const getNestedProxy = (
   prop: string,
@@ -36,55 +28,6 @@ const getNestedProxy = (
   }
 
   return makeProxy(value as ResolvedValue | null, path, updateQuery)
-}
-
-const getFragmentString = (type: string) => {
-  return `["... on ${type}"]`
-}
-
-const getArgsString = (args: object) => {
-  let argString = '('
-
-  for (let key in args) {
-    const value = args[key]
-    argString += `${key}: `
-
-    switch (typeof value) {
-      case 'string':
-        argString += args[key].charAt(0) === '$' ? args[key] : `'${args[key]}'`
-        break
-      case 'number':
-        argString += args[key]
-        break
-      default:
-        throw new Error('Unhandled paramter type %s of %s')
-    }
-
-    argString += ','
-  }
-
-  return argString + ')'
-}
-
-const getVariablesString = (args: object) => {
-  let argString = '('
-
-  for (let key in args) {
-    const value = args[key]
-    argString += `${key}: `
-
-    switch (typeof value) {
-      case 'string':
-        argString += args[key]
-        break
-      default:
-        throw new Error('Unhandled paramter type %s of %s')
-    }
-
-    argString += ','
-  }
-
-  return argString + ')'
 }
 
 export function makeProxy(

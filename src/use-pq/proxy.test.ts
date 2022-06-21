@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
-import { makeProxy } from './makeProxy'
-import { VirtualProperty } from './VirtualProperty'
+import { makeProxy } from './proxy'
+import { VirtualProperty } from './virtual-property'
 
 describe('makeProxy', () => {
   it('sets a simple object', () => {
