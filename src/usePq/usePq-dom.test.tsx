@@ -86,7 +86,6 @@ describe('usePq in render', () => {
 
   test('empty arrays', async () => {
     const handleQuery = (b?) => async (query) => {
-      console.log(b, query)
       return query ? { a: { b } } : null
     }
 
@@ -128,5 +127,48 @@ describe('usePq in render', () => {
     })
 
     expect(mock).toHaveBeenCalledTimes(2)
+  })
+
+  test('empty objects', async () => {
+    const handleQuery = (b?) => async (query) => {
+      return query ? { a: { b } } : null
+    }
+
+    const mock = vi
+      .fn()
+      .mockImplementationOnce(handleQuery())
+      .mockImplementationOnce(handleQuery({}))
+      .mockImplementationOnce(handleQuery({ c: { d: 1 } }))
+
+    const component = React.createElement(
+      ({ handler }) => {
+        const [p] = usePq(handler)
+        const [c, setC] = useState(0)
+
+        return (
+          <>
+            <span data-testid="target">{p.a.$({ c }).b.c.d}</span>
+            <button data-testid="button" onClick={() => setC(c + 1)}></button>
+          </>
+        )
+      },
+      { handler: mock }
+    )
+
+    render(component)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('target').innerHTML).toBe('')
+    })
+
+    act(() => {
+      screen.getByTestId('button').click()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('target').innerHTML).toBe('1')
+    })
+
+    expect(mock).toHaveBeenCalledTimes(3)
   })
 })
