@@ -11,8 +11,9 @@ import {
 import {
   EMPTY_VALUE,
   Path,
-  VirtualProperty,
   ResolvedValue,
+  VirtualObjectProperty,
+  VirtualProperty,
 } from './virtual-property'
 
 const getNestedProxy = (
@@ -22,23 +23,23 @@ const getNestedProxy = (
   updateQuery: (target: VirtualProperty) => void
 ) => {
   if (isListProp(prop)) {
-    return ((value as ResolvedValue[] | null) || [EMPTY_VALUE]).map((entry) =>
-      makeProxy(entry, path, updateQuery)
+    return ((value as ResolvedValue[]) || [EMPTY_VALUE]).map((entry) =>
+      join(entry, path, updateQuery)
     )
   }
 
-  return makeProxy(value as ResolvedValue | null, path, updateQuery)
+  return join(value as ResolvedValue, path, updateQuery)
 }
 
-export function makeProxy(
-  value: ResolvedValue | typeof EMPTY_VALUE,
+export const join = (
+  value: ResolvedValue,
   path: Path,
   updateQuery: (target: VirtualProperty) => void
-) {
-  const virtualProp = new VirtualProperty({ value, path })
+) => {
+  const vo = new VirtualObjectProperty({ value, path })
 
-  return new Proxy(virtualProp, {
-    get: (target, prop) => {
+  return new Proxy(vo, {
+    get: function (target, prop) {
       if (
         prop === 'get' ||
         prop === Symbol.toPrimitive ||

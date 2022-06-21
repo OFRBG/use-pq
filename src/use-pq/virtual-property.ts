@@ -1,12 +1,12 @@
 export const EMPTY_VALUE: null = null
 
+type Constructor<T = {}> = new (...args: any[]) => T
+
 export type Path = string | typeof EMPTY_VALUE
 
 export type ResolvedValue =
-  | {
-      [key: string]: ResolvedValue | ResolvedValue[]
-    }
   | ResolvedValue[]
+  | { [key: string]: ResolvedValue }
   | string
   | number
   | null
@@ -19,38 +19,50 @@ export type VirtualPropertyInterface = {
   get: () => ResolvedValue
 }
 
-export type VirtualObject<T extends object> = {
-  [key in keyof T]: any
-}
+export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
+  class VirtualProperty
+    extends Base
+    implements Pick<VirtualPropertyInterface, 'path' | 'value'>
+  {
+    public path: string
+    private _value: ResolvedValue
 
-export class VirtualProperty
-  implements Pick<VirtualPropertyInterface, 'path' | 'value'>
-{
-  public path: string
-  private _value: ResolvedValue
+    constructor(...args: any[]) {
+      super(args.slice(1, args.length - 1))
 
-  constructor(props: { path: string; value?: ResolvedValue }) {
-    this.path = props.path
-    this._value = props.value
+      this.path = args[0].path
+      this._value = args[0].value
+    }
+
+    value(): ResolvedValue {
+      return this._value || EMPTY_VALUE
+    }
+
+    [Symbol.toStringTag]() {
+      return `Virtual${Base.name}Property`
+    }
+
+    [Symbol.toPrimitive]() {
+      return this.value()
+    }
+
+    *[Symbol.iterator]() {
+      yield this.value()
+    }
+
+    toString() {
+      return this.value().toString()
+    }
   }
 
-  value(): ResolvedValue {
-    return this._value || EMPTY_VALUE
-  }
+export const VirtualObjectProperty = VirtualProperty(Object)
+export const VirtualArrayProperty = VirtualProperty(Array)
 
-  [Symbol.toStringTag]() {
-    return 'VirtualProperty'
-  }
+const _vo = new VirtualObjectProperty({})
+const _va = new VirtualArrayProperty({})
 
-  [Symbol.toPrimitive]() {
-    return this.value()
-  }
-
-  *[Symbol.iterator]() {
-    yield this.value()
-  }
-
-  toString() {
-    return this.value().toString()
-  }
-}
+export type VirtualObjectPropertyType = typeof _vo
+export type VirtualArrayPropertyType = typeof _va
+export type VirtualProperty =
+  | VirtualObjectPropertyType
+  | VirtualArrayPropertyType

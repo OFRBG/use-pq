@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react'
 import set from 'lodash.set'
-import { makeProxy } from './proxy'
+import { join } from './proxy'
 import { VirtualProperty, VirtualPropertyInterface } from './virtual-property'
 
 const parseQuery = (q: object) => {
@@ -40,7 +40,7 @@ export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState<VirtualPropertyInterface>(
-    makeProxy(null, 'query', updateQuery(queryRef))
+    join(null, 'query', updateQuery(queryRef))
   )
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -62,7 +62,7 @@ export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   }, [handler, query])
 
   useEffect(() => {
-    setProxy(makeProxy(data, 'query', updateQuery(queryRef)))
+    setProxy(join(data, 'query', updateQuery(queryRef)))
   }, [data, query])
 
   return [proxy, query, isLoading] as const
