@@ -1,6 +1,6 @@
 export const EMPTY_VALUE: null = null
 
-type Constructor<T = {}> = new (...args: any[]) => T
+export type Constructor<T = {}> = new (...args: any[]) => T
 
 export type Path = string | typeof EMPTY_VALUE
 
@@ -25,21 +25,34 @@ export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
     implements Pick<VirtualPropertyInterface, 'path' | 'value'>
   {
     public path: string
-    private _value: ResolvedValue
+    #value: ResolvedValue
 
     constructor(...args: any[]) {
       super(args.slice(1, args.length - 1))
 
       this.path = args[0].path
-      this._value = args[0].value
+      this.#value = args[0].value
+      this.value = this.value.bind(this)
     }
 
-    value(): ResolvedValue {
-      return this._value || EMPTY_VALUE
+    get() {
+      return this.value()
+    }
+
+    value() {
+      return this.#value || EMPTY_VALUE
+    }
+
+    #name() {
+      return `Virtual${Base.name}Property`
+    }
+
+    [Symbol.name]() {
+      return this.#name
     }
 
     [Symbol.toStringTag]() {
-      return `Virtual${Base.name}Property`
+      return this.#name
     }
 
     [Symbol.toPrimitive]() {

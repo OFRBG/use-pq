@@ -1,7 +1,7 @@
 /// <reference types="vitest/globals" />
 import '@testing-library/jest-dom'
 
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { screen, render, waitFor } from '@testing-library/react'
 import { usePq } from './use-pq'
 import { act } from '@testing-library/react-hooks'

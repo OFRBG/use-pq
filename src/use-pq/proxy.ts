@@ -9,11 +9,13 @@ import {
   parseProp,
 } from './property'
 import {
-  EMPTY_VALUE,
+  Constructor,
   Path,
   ResolvedValue,
+  VirtualArrayProperty,
   VirtualObjectProperty,
   VirtualProperty,
+  VirtualPropertyInterface,
 } from './virtual-property'
 
 const getNestedProxy = (
@@ -22,23 +24,17 @@ const getNestedProxy = (
   path: string,
   updateQuery: (target: VirtualProperty) => void
 ) => {
-  if (isListProp(prop)) {
-    return ((value as ResolvedValue[]) || [EMPTY_VALUE]).map((entry) =>
-      join(entry, path, updateQuery)
-    )
-  }
-
-  return join(value as ResolvedValue, path, updateQuery)
+  return (isListProp(prop) ? joinArray : joinObject)(
+    value as ResolvedValue,
+    path,
+    updateQuery
+  )
 }
 
-export const join = (
-  value: ResolvedValue,
-  path: Path,
+function handlerWithEffect(
   updateQuery: (target: VirtualProperty) => void
-) => {
-  const vo = new VirtualObjectProperty({ value, path })
-
-  return new Proxy(vo, {
+): ProxyHandler<VirtualProperty> {
+  return {
     get: function (target, prop) {
       if (
         prop === 'get' ||
@@ -96,5 +92,20 @@ export const join = (
 
       return getNestedProxy(prop, requestedValue, path + params, updateQuery)
     },
-  })
+  }
 }
+
+export const join =
+  (VirtualProperty: Constructor<VirtualProperty> = VirtualObjectProperty) =>
+  (
+    value: ResolvedValue,
+    path: Path,
+    updateQuery: (target: VirtualProperty) => void
+  ): VirtualPropertyInterface => {
+    const vo = new VirtualProperty({ value, path })
+
+    return new Proxy<VirtualProperty>(vo, handlerWithEffect(updateQuery))
+  }
+
+export const joinObject = join(VirtualObjectProperty)
+export const joinArray = join(VirtualArrayProperty)
