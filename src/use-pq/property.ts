@@ -1,5 +1,8 @@
 import { EMPTY_VALUE, Path } from './virtual-property'
 
+export const isIndexProp = (prop: Path) =>
+  prop !== EMPTY_VALUE && Number.isInteger(Number(prop))
+
 export const isListProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
 

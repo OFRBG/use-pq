@@ -126,7 +126,7 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target').innerHTML).toBe('1')
     })
 
-    expect(mock).toHaveBeenCalledTimes(2)
+    expect(mock).toHaveBeenCalledTimes(3)
   })
 
   test('empty objects', async () => {

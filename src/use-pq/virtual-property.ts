@@ -28,10 +28,12 @@ export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
     #value: ResolvedValue
 
     constructor(...args: any[]) {
-      super(args.slice(1, args.length - 1))
+      const { path, value } = args[0]
 
-      this.path = args[0].path
-      this.#value = args[0].value
+      super(...(Array.isArray(value) ? value : []))
+
+      this.path = path
+      this.#value = value
       this.value = this.value.bind(this)
     }
 

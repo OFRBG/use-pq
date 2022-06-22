@@ -2,6 +2,7 @@ import {
   getArgsString,
   getFragmentString,
   getVariablesString,
+  isIndexProp,
   isInlineFragmentProp,
   isListProp,
   isParamProp,
@@ -24,11 +25,19 @@ const getNestedProxy = (
   path: string,
   updateQuery: (target: VirtualProperty) => void
 ) => {
-  return (isListProp(prop) ? joinArray : joinObject)(
-    value as ResolvedValue,
-    path,
-    updateQuery
-  )
+  if (isListProp(prop)) {
+    return value && (value as ResolvedValue[]).length > 0
+      ? joinArray(
+          (value as ResolvedValue[]).map((entry) =>
+            joinObject(entry, path, updateQuery)
+          ),
+          path,
+          updateQuery
+        )
+      : joinArray([joinObject(undefined, path, updateQuery)], path, updateQuery)
+  }
+
+  return joinObject(value as ResolvedValue, path, updateQuery)
 }
 
 function handlerWithEffect(
@@ -59,6 +68,10 @@ function handlerWithEffect(
       const [parsedProp, params] = parseProp(prop)
       const requestedValue = target.value()?.[parsedProp]
       const path = `${target.path}.${parsedProp}`
+
+      if (isIndexProp(prop)) {
+        return getNestedProxy(prop, target.value(), target.path, updateQuery)
+      }
 
       if (isParamProp(prop)) {
         return (params: object) =>
