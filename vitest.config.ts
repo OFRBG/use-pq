@@ -6,7 +6,8 @@ export default defineConfig({
     environment: 'jsdom',
     reporters: 'dot',
     coverage: {
-      reporter: ['lcov', 'clover'],
+      clean: true,
+      reporter: ['clover', 'json', 'lcovonly'],
     },
   },
 })
