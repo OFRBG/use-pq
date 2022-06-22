@@ -7,12 +7,18 @@
 
 <br />
 <div align="center">
-<h3 align="center">use-pq</h3>
+  <a href="https://github.com/ofrbg/pqrs">
+    <img src="assets/logo.png" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">use-pq</h3>
 
   <p align="center">
     Queryless GraphQL
     <br />
-    <a href="https://github.com/ofrbg/pqrs">View Demo</a>
+    <a href="https://codesandbox.io/s/graphqmon-lipwgx?file=/src/PokemonList.tsx">Demo 1</a>
+    -
+    <a href="https://codesandbox.io/s/graphime-vkhqji?file=/src/Graphime.tsx">Demo 2</a>
     ·
     <a href="https://github.com/ofrbg/pqrs/issues">Report Bug</a>
     ·
