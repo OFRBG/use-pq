@@ -65,7 +65,7 @@
   </blockquote>
 </p>
 
-`usePq` aims to make GraphQL comsumption truly only-what-you-need. GraphQL is a great tool for data fetching without bombarding an API with chained requests or building a local replica. The one thing that annoys me about GraphQL is writing query files. These need to be tweaked, formatted, and in some cases compiled and shipped as utilities.
+`usePq` aims to make GraphQL consumption truly only-what-you-need. GraphQL is a great tool for data fetching without bombarding an API with chained requests or building a local replica. The one thing that annoys me about GraphQL is writing query files. These need to be tweaked, formatted, and in some cases compiled and shipped as utilities.
 
 Building a query per page seems to me like patching RESTful thinking into GraphQL. The idea behind `usePq` is to do with query declarations and instead use observables to build the _exact_ query that you need, just as GraphQL was meant to be used.
 
@@ -285,7 +285,7 @@ export function Users() {
 }
 ```
 
-### Commiting captured changes in children
+### Committing captured changes in children
 
 `usePq` relies on rerendering cycles to capture and commit fields that were accessed. If `usePq` is call in a parent component and passed down as a prop to a child, rerendering the child and not the parent will not trigger the commit. Invoking `commitQuery` does this job.
 
