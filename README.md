@@ -1,5 +1,10 @@
 <div id="top"></div>
 
+![npm](https://img.shields.io/npm/v/use-pq?style=flat-square)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-pq?style=flat-square)
+![Codecov](https://img.shields.io/codecov/c/gh/ofrbg/pqrs?style=flat-square&token=WSCHIA80X9)
+[![GitHub license](https://img.shields.io/github/license/OFRBG/pqrs?style=flat-square)](https://github.com/OFRBG/pqrs/blob/main/LICENSE)
+
 <br />
 <div align="center">
 <h3 align="center">use-pq</h3>
