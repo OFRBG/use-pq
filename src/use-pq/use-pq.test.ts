@@ -236,15 +236,15 @@ describe('usePq', () => {
     await waitForNextUpdate()
 
     expect(result.current[2]).toBe(false)
-    expect(mock).toHaveBeenCalledTimes(3)
+    expect(mock).toHaveBeenCalledTimes(2)
+    expect(result.current[1]).toContain(getArgField('second'))
     expect(mock).toHaveBeenNthCalledWith(
-      2,
+      1,
       expect.stringContaining(getArgField('first'))
     )
     expect(mock).toHaveBeenNthCalledWith(
-      3,
+      2,
       expect.stringContaining(getArgField('second'))
     )
-    expect(result.current[1]).toContain(getArgField('second'))
   })
 })

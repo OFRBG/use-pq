@@ -16,7 +16,7 @@ export const isVariableProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop === 'with'
 
 export const parseProp = (prop: string): [string, string, string] => {
-  const queryProp = prop.replace(/\(.*\)|_$/gm, '')
+  const queryProp = prop.replace(/\s|\(.*\)|_$/gm, '')
   const params = prop.match(/\((.*)\)/)?.[0] || ''
 
   return [queryProp, params, '']
@@ -31,7 +31,7 @@ export const getArgsString = (args: object) => {
 
   for (let key in args) {
     const value = args[key]
-    argString += `${key}: `
+    argString += `${key}:`
 
     switch (typeof value) {
       case 'string':
@@ -55,7 +55,7 @@ export const getVariablesString = (args: object) => {
 
   for (let key in args) {
     const value = args[key]
-    argString += `${key}: `
+    argString += `${key.charAt(0) !== '$' ? '$' : ''}${key}:`
 
     switch (typeof value) {
       case 'string':
