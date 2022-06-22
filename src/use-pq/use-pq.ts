@@ -45,13 +45,15 @@ export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  const commitQuery = () => {
+    setQuery(parseQuery(queryRef.current))
+  }
+
   useLayoutEffect(() => {
     setIsLoading(data === null && Object.keys(queryRef.current).length > 0)
   })
 
-  useEffect(() => {
-    setQuery(parseQuery(queryRef.current))
-  })
+  useEffect(commitQuery)
 
   useEffect(() => {
     setData(null)
@@ -65,5 +67,5 @@ export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
     setProxy(joinObject(data, 'query', updateQuery(queryRef)))
   }, [data, query])
 
-  return [proxy, query, isLoading] as const
+  return [proxy, query, { commitQuery, isLoading }] as const
 }

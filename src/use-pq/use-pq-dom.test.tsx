@@ -6,6 +6,11 @@ import { screen, render, waitFor } from '@testing-library/react'
 import { usePq } from './use-pq'
 import { act } from '@testing-library/react'
 
+const PqProvider = ({ handler, Child }) => {
+  const [p, q, { commitQuery }] = usePq(handler)
+  return <Child {...{ p, q, commitQuery }} />
+}
+
 describe('usePq in render', () => {
   afterEach(() => {
     vi.clearAllMocks()
@@ -154,6 +159,46 @@ describe('usePq in render', () => {
     )
 
     render(component)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('target').innerHTML).toBe('')
+    })
+
+    act(() => {
+      screen.getByTestId('button').click()
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('target').innerHTML).toBe('1')
+    })
+
+    expect(mock).toHaveBeenCalledTimes(2)
+  })
+
+  test('injected p', async () => {
+    const handleQuery = (b?) => async (query) => {
+      return query ? { a: { b } } : null
+    }
+
+    const mock = vi
+      .fn()
+      .mockImplementationOnce(handleQuery({}))
+      .mockImplementationOnce(handleQuery({ c: { d: 1 } }))
+
+    const component = ({ p, commitQuery }) => {
+      const [c, setC] = useState(0)
+
+      useEffect(commitQuery)
+
+      return (
+        <>
+          <span data-testid="target">{p.a.$({ c }).b.c.d}</span>
+          <button data-testid="button" onClick={() => setC(c + 1)}></button>
+        </>
+      )
+    }
+
+    render(<PqProvider handler={mock} Child={component} />)
 
     await waitFor(() => {
       expect(screen.getByTestId('target').innerHTML).toBe('')

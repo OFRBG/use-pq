@@ -84,7 +84,7 @@ import { usePq } from "use-pq"
 import client from "api"
 
 export function UserStatus() {
-  const [p, q, isLoading] = usePq(async (query) =>
+  const [p, q, { isLoading }] = usePq(async (query) =>
     // Use any GraphQL client that can post a string query
     // and set the response.
     client.query(query).then(({data}) => data)
@@ -132,7 +132,7 @@ Lists of fields cannot be access by themselves. It is possible to declare a fiel
 
 ```tsx
 export function Users() {
-  const [p, q, isLoading] = usePq(handler)
+  const [p, q, { isLoading }] = usePq(handler)
 
   // users is a plain array
   const users = p.users_
@@ -165,7 +165,7 @@ Fields with arguments can be declared by accessing a key in bracket notation.
 
 ```tsx
 export function User({ id }) {
-  const [p, q, isLoading] = usePq(handler)
+  const [p, q, { isLoading }] = usePq(handler)
 
   // Proxies can destructure properties
   const { id, name } = p[`user(id: ${id})`]
@@ -188,7 +188,7 @@ Combining the argument and list notation will return an array.
 
 ```tsx
 export function UsersLimit({ limit }) {
-  const [p, q, isLoading] = usePq(handler)
+  const [p, q, { isLoading }] = usePq(handler)
 
   const users = p[`users(limit: ${limit})_`].map(({id, name}) => (
     `${id}: ${name}`
@@ -212,7 +212,7 @@ It is possible to provide arguments without string interpolation by using a `$` 
 
 ```tsx
 export function User({ id }) {
-  const [p, q, isLoading] = usePq(handler)
+  const [p, q, { isLoading }] = usePq(handler)
 
   // The function name can be anything
   // as long as the first character is $
@@ -238,7 +238,7 @@ Arguments as function can also be used for list fields, with a difference compar
 
 ```tsx
 export function Users() {
-  const [p, q, isLoading] = usePq(handler)
+  const [p, q, { isLoading }] = usePq(handler)
 
   // The function name can be anything
   // as long as the first character is $ and

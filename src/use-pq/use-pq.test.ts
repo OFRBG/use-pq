@@ -1,4 +1,5 @@
 /// <reference types="vitest/globals" />
+import { act } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
 import { usePq } from './use-pq'
 
@@ -23,10 +24,10 @@ describe('usePq', () => {
     result.current[0].field.subfield.get()
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(result.current[0].field.subfield.get()).toBe('test')
   })
@@ -48,10 +49,10 @@ describe('usePq', () => {
     list.map((entry) => entry.leaf.get())
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(result.current[0].field.subfield_[0].leaf.get()).toBe('1')
   })
@@ -75,10 +76,10 @@ describe('usePq', () => {
     list.map((entry) => entry.leaf.get())
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(result.current[0].field.subfield_[0].leaf.get()).toBe('1')
     expect(result.current[0].field.notTree.get()).toBe(true)
@@ -97,10 +98,10 @@ describe('usePq', () => {
     result.current[0][getArgField(1)].subfield.get()
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(result.current[0].field.subfield.id.get()).toBe(1)
     expect(result.current[1]).toContain(getArgField(1))
@@ -119,10 +120,10 @@ describe('usePq', () => {
     result.current[0].field.$params({ id: '1' }).subfield.get()
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(result.current[0].field.subfield.get()).toBe('test')
   })
@@ -142,10 +143,10 @@ describe('usePq', () => {
     list.map((entry) => entry.subfield.get())
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(
       result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
@@ -168,10 +169,10 @@ describe('usePq', () => {
     list.map((entry) => entry.subfield.get())
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(
       result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
@@ -194,10 +195,10 @@ describe('usePq', () => {
       .subfield.get()
 
     rerender()
-    expect(result.current[2]).toBe(true)
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalled()
     expect(
       result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
@@ -221,7 +222,11 @@ describe('usePq', () => {
     list.map((entry) => entry.meta.id.get())
 
     rerender()
-    expect(result.current[2]).toBe(true)
+
+    expect(mock).toHaveBeenLastCalledWith(
+      expect.stringContaining(getArgField('first'))
+    )
+    expect(result.current[2].isLoading).toBe(true)
     await waitForNextUpdate()
 
     list = result.current[0][makeFieldArray(getArgField('second'))]
@@ -229,22 +234,58 @@ describe('usePq', () => {
     list.map((entry) => entry.meta.id.get())
 
     rerender()
-    expect(result.current[2]).toBe(true)
+
+    expect(mock).toHaveBeenLastCalledWith(
+      expect.stringContaining(getArgField('second'))
+    )
+    expect(result.current[2].isLoading).toBe(true)
     expect(
       result.current[0][makeFieldArray(getArgField('second'))][0].subfield.get()
     ).toBeNull()
     await waitForNextUpdate()
 
-    expect(result.current[2]).toBe(false)
+    expect(result.current[2].isLoading).toBe(false)
     expect(mock).toHaveBeenCalledTimes(2)
-    expect(result.current[1]).toContain(getArgField('second'))
-    expect(mock).toHaveBeenNthCalledWith(
-      1,
+  })
+
+  test('commit query', async () => {
+    const handleQuery = async (query) => {
+      return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null
+    }
+
+    let list
+
+    const mock = vi.fn().mockImplementation(handleQuery)
+    const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
+
+    list = result.current[0][makeFieldArray(getArgField('first'))]
+    list.map((entry) => entry.subfield.get())
+    list.map((entry) => entry.meta.id.get())
+    result.current[2].commitQuery()
+
+    expect(mock).toHaveBeenLastCalledWith(
       expect.stringContaining(getArgField('first'))
     )
-    expect(mock).toHaveBeenNthCalledWith(
-      2,
+    expect(result.current[2].isLoading).toBe(true)
+
+    await waitForNextUpdate()
+
+    list = result.current[0][makeFieldArray(getArgField('second'))]
+    list.map((entry) => entry.subfield.get())
+    list.map((entry) => entry.meta.id.get())
+    result.current[2].commitQuery()
+
+    expect(mock).toHaveBeenLastCalledWith(
       expect.stringContaining(getArgField('second'))
     )
+    expect(result.current[2].isLoading).toBe(true)
+    expect(
+      result.current[0][makeFieldArray(getArgField('second'))][0].subfield.get()
+    ).toBeNull()
+
+    await waitForNextUpdate()
+
+    expect(result.current[2].isLoading).toBe(false)
+    expect(mock).toHaveBeenCalledTimes(2)
   })
 })
