@@ -45,11 +45,13 @@
 </details>
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 `usePq` aims to make GraphQL comsumption truly only-what-you-need. GraphQL is a great tool for data fetching without bombarding an API with chained requests or building a local replica. The one thing that annoys me about GraphQL is writing query files. These need to be tweaked, formatted, and in some cases compiled and shipped as utilities.
 
 Building a query per page seems to me like patching RESTful thinking into GraphQL. The idea behind `usePq` is to do with query declarations and instead use observables to build the _exact_ query that you need, just as GraphQL was meant to be used.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Package Details
@@ -80,14 +82,14 @@ pnpm add use-pq
 In a component, call `usePq` and provide a query handler. You can then request fields to fetch by accessing keys from `p`.
 
 ```tsx
-import { usePq } from "use-pq"
-import client from "api"
+import { usePq } from 'use-pq'
+import client from 'api'
 
 export function UserStatus() {
   const [p, q, { isLoading }] = usePq(async (query) =>
     // Use any GraphQL client that can post a string query
     // and set the response.
-    client.query(query).then(({data}) => data)
+    client.query(query).then(({ data }) => data)
   )
 
   // Access and build any reference from p
@@ -111,9 +113,14 @@ export function UserStatus() {
 
 ## API
 
+```ts
+const [p, q, { isLoading, commitQuery }] = usePq(handler)
+```
+
 ### Arguments
 
 **handler**: `usePq` takes a single argument, which is a function with two arguments: the query and a data setter.
+
 > The data setter **must** be called asynchronously.
 
 ### Return value
@@ -123,6 +130,8 @@ export function UserStatus() {
 **q**: The query that was built from the render phase from accessing `` properties. If the field was accessed by React during rendering, it will also be registered.
 
 **isLoading**: The state of the field capture phase. This is `true` while a query does not exist and the client has not set any data.
+
+**commitQuery**: A function that can be called to manually trigger a commit of captured changes to the query.
 
 ### Feature Usage
 
@@ -175,7 +184,9 @@ export function User({ id }) {
       {isLoading ? (
         <span>loading...</span>
       ) : (
-        <span>{id}: {name}</span>
+        <span>
+          {id}: {name}
+        </span>
       )}
     </div>
   )
@@ -190,16 +201,16 @@ Combining the argument and list notation will return an array.
 export function UsersLimit({ limit }) {
   const [p, q, { isLoading }] = usePq(handler)
 
-  const users = p[`users(limit: ${limit})_`].map(({id, name}) => (
-    `${id}: ${name}`
-  ))
+  const users = p[`users(limit: ${limit})_`].map(
+    ({ id, name }) => `${id}: ${name}`
+  )
 
   return (
     <div>
       {isLoading ? (
         <span>loading...</span>
       ) : (
-        users.map(entry => <span>{entry}</span>)
+        users.map((entry) => <span>{entry}</span>)
       )}
     </div>
   )
@@ -252,6 +263,33 @@ export function Users() {
       ) : (
         users.map((entry) => <span>{entry}</span>)
       )}
+    </div>
+  )
+}
+```
+
+### Commiting captured changes in children
+
+`usePq` relies on rerendering cycles to capture and commit fields that were accessed. If `usePq` is call in a parent component and passed down as a prop to a child, rerendering the child and not the parent will not trigger the commit. Invoking `commitQuery` does this job.
+
+```tsx
+function App() {
+  const [{ user }, q, { commitQuery, isLoading }] = usePq(handler)
+
+  return <User user={user} commitQuery={commitQuery} />
+}
+
+export function User({ user, commitQuery }) {
+  const [id, setId] = useState(1)
+
+  // When id changes, the query will be updated after
+  // rendering.
+  useEffect(commitQuery, [id])
+
+  return (
+    <div>
+      {isLoading ? <span>loading...</span> : <span>{user.$({ id }).name}</span>}
+      <button onClick={() => setId(i + 1)}>next</button>
     </div>
   )
 }
