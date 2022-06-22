@@ -1,8 +1,8 @@
 <div id="top"></div>
 
-![npm](https://img.shields.io/npm/v/use-pq?style=flat-square)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-pq?style=flat-square)
-![Codecov](https://img.shields.io/codecov/c/gh/ofrbg/pqrs?style=flat-square&token=WSCHIA80X9)
+[![npm](https://img.shields.io/npm/v/use-pq?style=flat-square)](https://www.npmjs.com/package/use-pq)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-pq?style=flat-square)](https://bundlephobia.com/package/use-pq)
+[![Codecov](https://img.shields.io/codecov/c/gh/ofrbg/pqrs?style=flat-square&token=WSCHIA80X9)](https://codecov.io/gh/OFRBG/pqrs)
 [![GitHub license](https://img.shields.io/github/license/OFRBG/pqrs?style=flat-square)](https://github.com/OFRBG/pqrs/blob/main/LICENSE)
 
 <br />
@@ -59,11 +59,9 @@
 
 ## About The Project
 
-<p align="center">
-  <blockquote>
-    ⚠️ `use-pq` is an experimental package that is likely to have undiscovered bugs. Proceed with sensibility. ⚠️
-  </blockquote>
-</p>
+<blockquote>
+  ⚠️ `use-pq` is an experimental package that is likely to have undiscovered bugs. Proceed with sensibility. ⚠️
+</blockquote>
 
 `usePq` aims to make GraphQL consumption truly only-what-you-need. GraphQL is a great tool for data fetching without bombarding an API with chained requests or building a local replica. The one thing that annoys me about GraphQL is writing query files. These need to be tweaked, formatted, and in some cases compiled and shipped as utilities.
 
