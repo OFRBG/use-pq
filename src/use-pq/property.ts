@@ -42,13 +42,15 @@ export const getArgsString = (args: object) => {
         break
       case 'object':
         if (args[key] instanceof VirtualObjectProperty) {
-          argString += args[key].get()
+          argString += JSON.stringify(args[key].get())
           break
         } else {
-          continue
+          throw new Error(
+            `Unhandled parameter type ${typeof value} of ${value}`
+          )
         }
       default:
-        throw new Error(`Unhandled paramter type ${typeof value} of ${value}`)
+        throw new Error(`Unhandled parameter type ${typeof value} of ${value}`)
     }
 
     argString += ','
@@ -69,7 +71,7 @@ export const getVariablesString = (args: object) => {
         argString += args[key]
         break
       default:
-        throw new Error(`Unhandled paramter type ${typeof value} of ${value}`)
+        throw new Error(`Unhandled parameter type ${typeof value} of ${value}`)
     }
 
     argString += ','

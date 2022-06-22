@@ -10,11 +10,21 @@ import {
   isVariableProp,
   parseProp,
 } from './property'
+import { VirtualArrayProperty, VirtualObjectProperty } from './virtual-property'
 
 describe('object parsers', () => {
   test('getArgsString', () => {
     expect(getArgsString({ a: 1 })).toBe('(a:1,)')
     expect(getArgsString({ a: '2' })).toBe('(a:"2",)')
+    expect(
+      getArgsString({ a: new VirtualObjectProperty({ value: '2' }) })
+    ).toBe('(a:"2",)')
+    expect(getArgsString({ a: new VirtualObjectProperty({ value: 2 }) })).toBe(
+      '(a:2,)'
+    )
+    expect(() =>
+      getArgsString({ a: new VirtualArrayProperty({ value: [] }) })
+    ).toThrow()
     expect(() => getArgsString({ a: Symbol('1') })).toThrow()
   })
 
