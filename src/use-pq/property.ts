@@ -1,4 +1,4 @@
-import { EMPTY_VALUE, Path } from './virtual-property'
+import { EMPTY_VALUE, Path, VirtualObjectProperty } from './virtual-property'
 
 export const isIndexProp = (prop: Path) =>
   prop !== EMPTY_VALUE && Number.isInteger(Number(prop))
@@ -35,13 +35,20 @@ export const getArgsString = (args: object) => {
 
     switch (typeof value) {
       case 'string':
-        argString += args[key].charAt(0) === '$' ? args[key] : `'${args[key]}'`
+        argString += args[key].charAt(0) === '$' ? args[key] : `"${args[key]}"`
         break
       case 'number':
         argString += args[key]
         break
+      case 'object':
+        if (args[key] instanceof VirtualObjectProperty) {
+          argString += args[key].get()
+          break
+        } else {
+          continue
+        }
       default:
-        throw new Error('Unhandled paramter type %s of %s')
+        throw new Error(`Unhandled paramter type ${typeof value} of ${value}`)
     }
 
     argString += ','
@@ -62,7 +69,7 @@ export const getVariablesString = (args: object) => {
         argString += args[key]
         break
       default:
-        throw new Error('Unhandled paramter type %s of %s')
+        throw new Error(`Unhandled paramter type ${typeof value} of ${value}`)
     }
 
     argString += ','
