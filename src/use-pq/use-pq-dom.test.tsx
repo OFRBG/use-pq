@@ -1,10 +1,10 @@
 /// <reference types="vitest/globals" />
 import '@testing-library/jest-dom'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { screen, render, waitFor } from '@testing-library/react'
 import { usePq } from './use-pq'
-import { act } from '@testing-library/react-hooks'
+import { act } from '@testing-library/react'
 
 describe('usePq in render', () => {
   afterEach(() => {
@@ -32,7 +32,7 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target')).toHaveAttribute('data-id', '1')
     })
 
-    expect(mock).toHaveBeenCalledTimes(2)
+    expect(mock).toHaveBeenCalledTimes(1)
   })
 
   test('set child', async () => {
@@ -56,7 +56,7 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target').innerHTML).toBe('1')
     })
 
-    expect(mock).toHaveBeenCalledTimes(2)
+    expect(mock).toHaveBeenCalledTimes(1)
   })
 
   test('skip field only in render', async () => {
@@ -81,7 +81,7 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target').innerHTML).toBe('')
     })
 
-    expect(mock).toHaveBeenCalledTimes(1)
+    expect(mock).toHaveBeenCalledTimes(0)
   })
 
   test('empty arrays', async () => {
@@ -91,7 +91,6 @@ describe('usePq in render', () => {
 
     const mock = vi
       .fn()
-      .mockImplementationOnce(handleQuery())
       .mockImplementationOnce(handleQuery([]))
       .mockImplementationOnce(handleQuery([{ c: 1 }]))
 
@@ -126,7 +125,7 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target').innerHTML).toBe('1')
     })
 
-    expect(mock).toHaveBeenCalledTimes(3)
+    expect(mock).toHaveBeenCalledTimes(2)
   })
 
   test('empty objects', async () => {
@@ -136,7 +135,6 @@ describe('usePq in render', () => {
 
     const mock = vi
       .fn()
-      .mockImplementationOnce(handleQuery())
       .mockImplementationOnce(handleQuery({}))
       .mockImplementationOnce(handleQuery({ c: { d: 1 } }))
 
@@ -169,6 +167,6 @@ describe('usePq in render', () => {
       expect(screen.getByTestId('target').innerHTML).toBe('1')
     })
 
-    expect(mock).toHaveBeenCalledTimes(3)
+    expect(mock).toHaveBeenCalledTimes(2)
   })
 })

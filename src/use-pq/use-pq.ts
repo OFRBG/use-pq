@@ -58,7 +58,7 @@ export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
   }, [query])
 
   useEffect(() => {
-    handler(query).then(setData)
+    query && handler(query).then(setData)
   }, [handler, query])
 
   useEffect(() => {
