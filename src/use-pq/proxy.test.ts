@@ -17,7 +17,7 @@ describe('makeProxy', () => {
     expect(proxy.virtual.get()).toBe(null)
   })
 
-  it.only('creates nested array proxies', () => {
+  it('creates nested array proxies', () => {
     const proxy = joinArray(null, 'query', () => {})
 
     expect(proxy.virtual_[1].leaf.path).toBe('query.virtual.leaf')
