@@ -2,12 +2,12 @@
 
 [![npm](https://img.shields.io/npm/v/use-pq?style=flat-square)](https://www.npmjs.com/package/use-pq)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/use-pq?style=flat-square)](https://bundlephobia.com/package/use-pq)
-[![Codecov](https://img.shields.io/codecov/c/gh/ofrbg/pqrs?style=flat-square&token=WSCHIA80X9)](https://codecov.io/gh/OFRBG/pqrs)
-[![GitHub license](https://img.shields.io/github/license/OFRBG/pqrs?style=flat-square)](https://github.com/OFRBG/pqrs/blob/main/LICENSE)
+[![Codecov](https://img.shields.io/codecov/c/gh/ofrbg/use-pq?style=flat-square&token=WSCHIA80X9)](https://codecov.io/gh/ofrbg/use-pq)
+[![GitHub license](https://img.shields.io/github/license/ofrbg/use-pq?style=flat-square)](https://github.com/ofrbg/use-pq/blob/main/LICENSE)
 
 <br />
 <div align="center">
-  <a href="https://github.com/ofrbg/pqrs">
+  <a href="https://github.com/ofrbg/use-pq">
     <img src="assets/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -20,9 +20,9 @@
     -
     <a href="https://codesandbox.io/s/graphime-vkhqji?file=/src/Graphime.tsx">Demo 2</a>
     ·
-    <a href="https://github.com/ofrbg/pqrs/issues">Report Bug</a>
+    <a href="https://github.com/ofrbg/use-pq/issues">Report Bug</a>
     ·
-    <a href="https://github.com/ofrbg/pqrs/issues">Request Feature</a>
+    <a href="https://github.com/ofrbg/use-pq/issues">Request Feature</a>
   </p>
 </div>
 
@@ -335,6 +335,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-Project Link: [https://github.com/ofrbg/pqrs](https://github.com/ofrbg/pqrs)
+Project Link: [https://github.com/ofrbg/use-pq](https://github.com/ofrbg/use-pq)
 
 <p align="right">(<a href="#top">back to top</a>)</p>

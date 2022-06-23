@@ -5,12 +5,12 @@
   "description": "Queryless GraphQL",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OFRBG/pqrs.git"
+    "url": "git+https://github.com/OFRBG/use-pq.git"
   },
   "bugs": {
-    "url": "https://github.com/OFRBG/pqrs/issues"
+    "url": "https://github.com/OFRBG/use-pq/issues"
   },
-  "homepage": "https://github.com/OFRBG/pqrs#readme",
+  "homepage": "https://use-pq.com",
   "author": "Oscar Fonseca <oscar.fonseca@formidable.com>",
   "license": "MIT",
   "type": "module",
