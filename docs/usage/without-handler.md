@@ -6,11 +6,11 @@ slug: without-handler
 
 # Without Handler
 
-:::danger Unpublished feature
-This feature is not yet available.
+:::caution Unstable feature
+This feature is new and not fully tested.
 :::
 
-`usePq` does not strictly require a handler, as the data fetching cycle happens as a result of the field capture, but not the other way around. It does, however, require a data source. To avoid a circular dependency, `bindData` can be executed whenever fetched data is received.
+`usePq` does not strictly require a handler, as the data fetching cycle happens as a result of the field capture, but not the other way around. It does, however, require a data source. To avoid a circular dependency, `bindData` can be called whenever fetched data is received.
 
 ```tsx
 export function User({ user, commitQuery }) {

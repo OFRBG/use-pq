@@ -10,18 +10,20 @@ import TabItem from '@theme/TabItem'
 ### Canonical Naming
 
 ```ts
-const [p, q, { isLoading, commitQuery }] = usePq(handler)
+const [p, q, { isLoading, commitQuery, bindData }] = usePq(handler)
 ```
 
 ## `usePq`
 
 ```ts
-type UsePq<T> = (
-  handler: QueryHandler<T>
-) => [
+type UsePq<T> = (handler: QueryHandler<T>) => [
   VirtualPropertyInterface,
   string,
-  { isLoading: boolean; commitQuery: () => void }
+  {
+    isLoading: boolean
+    commitQuery: () => void
+    bindData: (data: T) => void
+  }
 ]
 ```
 
@@ -34,7 +36,7 @@ type UsePq<T> = (
 **Type**
 
 ```ts
-type QueryHandler<T> = (query: string) => T | Promise<T>
+type QueryHandler<T> = ((query: string) => T | Promise<T>) | undefined
 ```
 
 **Description**
@@ -82,6 +84,7 @@ string
 type Control = {
   isLoading: boolean
   commitQuery: () => void
+  bindData: (data: T) => void
 }
 ```
 
@@ -90,3 +93,5 @@ type Control = {
 `isLoading` is the state of the field capture phase. This is `true` while the query is defined but the request data is null.
 
 `commitQuery` is an escape hatch used specifically in cases where a state update for a component does not trigger a rerender in the hook where `usePq` was called. If `p` is provided as a prop and the component rerenders, fields captured will _not_ be committed to the query. To make `use-pq` aware of the changes, `commitQuery` needs to be called in an effect e.g. `useEffect(commitQuery)`.
+
+`bindData` is the setter for the internal `usePq` data state. If `handler` is not sourcing the data, bindData can be used to hydrate `p`.
