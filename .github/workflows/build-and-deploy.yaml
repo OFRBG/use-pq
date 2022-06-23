@@ -1,0 +1,21 @@
+name: Build and Deploy
+
+on: [push]
+
+permissions: 
+  contents: write
+
+jobs:
+  build-and-deploy:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v3
+      - run: npm i -g pnpm
+      - run: pnpm i --frozen-lockfile
+      - run: pnpm build
+      - uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: gh-pages
+          folder: build
