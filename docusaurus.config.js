@@ -10,7 +10,7 @@ const REPO_PATH = 'ofrbg/pqrs'
 const config = {
   title: 'use-pq',
   tagline: 'Queryless GraphQL',
-  url: 'use-pq.com',
+  url: 'https://use-pq.com',
   baseUrl: '/',
   onBrokenLinks: 'error',
   onBrokenMarkdownLinks: 'warn',
