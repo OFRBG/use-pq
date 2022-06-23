@@ -8,5 +8,6 @@ export default defineConfig({
       clean: true,
       reporter: ['html', 'clover', 'json', 'lcovonly'],
     },
+    setupFiles: ['./src/setupTests.ts'],
   },
 })
