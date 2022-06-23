@@ -4,7 +4,7 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github')
 const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 
-const REPO_PATH = 'ofrbg/pqrs'
+const REPO_PATH = 'ofrbg/use-pq'
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -16,7 +16,7 @@ const config = {
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'ofrbg',
-  projectName: 'pqrs',
+  projectName: 'use-pq',
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
