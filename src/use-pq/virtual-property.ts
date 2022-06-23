@@ -42,7 +42,7 @@ export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
     }
 
     value() {
-      return this.#value || EMPTY_VALUE
+      return this.#value ?? EMPTY_VALUE
     }
 
     #name() {
