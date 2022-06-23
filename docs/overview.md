@@ -1,10 +1,19 @@
 ---
 sidebar_position: -99
-sidebar_label: 'Overview'
+sidebar_label: "Overview"
+title: ""
 slug: /
 ---
 
-# use-pq
+import Logo from "../static/img/logo.svg"
+
+<div class="text--center">
+<Logo width="100" height="100" />
+
+<h1>use-pq</h1>
+<subtitle>Queryless GraphQL</subtitle>
+
+</div>
 
 ## About the Project
 
