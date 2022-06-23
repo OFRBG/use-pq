@@ -38,7 +38,13 @@ const updateQuery =
 
 export type QueryHandler<T> = (query: string) => Promise<T>
 
-export function usePq<T = unknown>(handler: QueryHandler<T>) {
+export type UsePqReturn<T = unknown> = [
+  VirtualPropertyInterface,
+  string,
+  { bindData: (data: T) => void; commitQuery: () => void; isLoading: boolean }
+]
+
+export function usePq<T = unknown>(handler?: QueryHandler<T>): UsePqReturn {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState<VirtualPropertyInterface>(
@@ -62,12 +68,12 @@ export function usePq<T = unknown>(handler: QueryHandler<T>) {
   }, [query])
 
   useEffect(() => {
-    query && handler(query).then(setData)
+    query && handler?.(query).then(setData)
   }, [handler, query])
 
   useEffect(() => {
     setProxy(joinObject(data, 'query', updateQuery(queryRef)))
   }, [data, query])
 
-  return [proxy, query, { commitQuery, isLoading }] as const
+  return [proxy, query, { commitQuery, isLoading, bindData: setData }]
 }
