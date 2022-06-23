@@ -36,7 +36,9 @@ const updateQuery =
     set(query.current, target.path, '#')
   }
 
-export function usePq<T = unknown>(handler: (query: string) => Promise<T>) {
+export type QueryHandler<T> = (query: string) => Promise<T>
+
+export function usePq<T = unknown>(handler: QueryHandler<T>) {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState<VirtualPropertyInterface>(
