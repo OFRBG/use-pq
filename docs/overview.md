@@ -1,7 +1,8 @@
 ---
 sidebar_position: -99
-sidebar_label: "Overview"
-title: ""
+sidebar_label: 'Overview'
+title: ''
+description: A hook to enable queryless GraphQL. Fetch exactly what you need and let the machines generate the payloads.
 slug: /
 ---
 
