@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem'
 
 # Field Lists
 
-Lists of fields cannot be access by themselves. It is possible to declare a field as a field list by appending an `_` to its key.
+Lists of fields cannot be access by themselves. To mark a field as a list, the parent needs to be accessed with `.array('fieldName')`.
 
 <Tabs>
 <TabItem value="iterators" label="Iterators">
@@ -18,7 +18,7 @@ Lists of fields cannot be access by themselves. It is possible to declare a fiel
 export function Users() {
   const [p, q, { isLoading }] = usePq(handler)
 
-  const users = p.users_
+  const users = p.listOf('users')
 
   return (
     <div>
@@ -39,7 +39,7 @@ export function Users() {
 export function Users() {
   const [p, q, { isLoading }] = usePq(handler)
 
-  const users = p.users_
+  const users = p.listOf('users')
 
   return <div>{isLoading ? <span>loading...</span> : users[3]?.name}</div>
 }

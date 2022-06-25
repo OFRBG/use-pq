@@ -36,7 +36,7 @@ type UsePq<T> = (handler: QueryHandler<T>) => [
 **Type**
 
 ```ts
-type QueryHandler<T> = ((query: string) => T | Promise<T>) | undefined
+type QueryHandler<T> = ((query: string) => Promise<T>) | undefined
 ```
 
 **Description**

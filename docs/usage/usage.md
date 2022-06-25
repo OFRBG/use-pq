@@ -14,7 +14,7 @@ const client = createClient({
   url: "https://trygql.formidable.dev/graphql/basic-pokedex"
 })
 
-export const fetcher = async (query: string) => {
+export const fetcher = (query: string) => {
   if (!query) return
 
   return client
@@ -24,9 +24,7 @@ export const fetcher = async (query: string) => {
 }
 
 export function UserStatus() {
-  const [p, q, { isLoading }] = usePq((query) =>
-    client.query(query).then(({ data }) => data)
-  )
+  const [p, q, { isLoading }] = usePq(fetcher)
 
   const { title, name, status } = p.session.user
   const displayName = `${title}. ${name}`
