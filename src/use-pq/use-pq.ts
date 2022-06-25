@@ -8,7 +8,7 @@ import {
 import set from 'lodash.set'
 import { joinObject } from './proxy'
 import { VirtualProperty } from './virtual-property'
-import { VirtualPropertyInterface } from './virtual-property.types'
+import { VirtualObjectInterface } from './virtual-property.types'
 
 const parseQuery = (q: object) => {
   const json = JSON.stringify(q, null, 2)
@@ -40,7 +40,7 @@ const updateQuery =
 export type QueryHandler<T> = (query: string) => Promise<T>
 
 export type UsePqReturn<T> = [
-  VirtualPropertyInterface,
+  VirtualObjectInterface,
   string,
   { bindData: (data: T) => void; commitQuery: () => void; isLoading: boolean }
 ]
