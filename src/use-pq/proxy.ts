@@ -39,50 +39,45 @@ function handlerWithEffect(
   updateQuery: (target: VirtualProperty) => void
 ): ProxyHandler<VirtualProperty> {
   return {
-    get: function (target, prop) {
+    get: function (parent, prop) {
       if (
         prop === 'get' ||
         prop === Symbol.toPrimitive ||
         prop === Symbol.iterator
       ) {
-        updateQuery(target)
+        updateQuery(parent)
       }
 
       if (prop === 'get') {
-        return target.value
+        return parent.value
       }
 
-      if (prop in target) {
-        return target[prop]
+      if (prop in parent) {
+        return parent[prop]
       }
 
       if (typeof prop === 'symbol') {
         throw new Error('Symbol query paths are not supported.')
       }
 
-      const [parsedProp, params] = parseProp(prop)
-      const requestedValue = target.value()?.[parsedProp]
-      const path = `${target.path}.${parsedProp}`
-
       if (isIndexProp(prop)) {
-        return getNestedProxy(target.value(), target.path, updateQuery)
+        return getNestedProxy(parent.value(), parent.path, updateQuery)
       }
 
       if (isParamProp(prop)) {
-        return (params: object) => {
-          return getNestedProxy(
-            target.value(),
-            target.path + getArgsString(params),
+        return (params: object) =>
+          getNestedProxy(
+            parent.value(),
+            parent.path + getArgsString(params),
             updateQuery
           )
-        }
       }
 
       if (isVariableProp(prop)) {
         return (params: object) =>
           getNestedProxy(
-            target.value(),
-            target.path + getVariablesString(params),
+            parent.value(),
+            parent.path + getVariablesString(params),
             updateQuery
           )
       }
@@ -90,8 +85,8 @@ function handlerWithEffect(
       if (isInlineFragmentProp(prop)) {
         return (type: string) =>
           getNestedProxy(
-            target.value(),
-            target.path + getFragmentString(type),
+            parent.value(),
+            parent.path + getFragmentString(type),
             updateQuery
           )
       }
@@ -99,15 +94,19 @@ function handlerWithEffect(
       if (isListProp(prop)) {
         return (field: string) => {
           const [parsedProp] = parseProp(field)
-          const requestedValue = target.value()?.[parsedProp]
+          const requestedValue = parent.value()?.[parsedProp]
 
           return getNestedProxy(
             requestedValue?.length ? requestedValue : [undefined],
-            target.path + `.${field}`,
+            parent.path + `.${field}`,
             updateQuery
           )
         }
       }
+
+      const [parsedProp, params] = parseProp(prop)
+      const requestedValue = parent.value()?.[parsedProp]
+      const path = `${parent.path}.${parsedProp}`
 
       return getNestedProxy(requestedValue, path + params, updateQuery)
     },

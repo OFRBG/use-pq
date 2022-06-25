@@ -1,18 +1,18 @@
 import { EMPTY_VALUE, Path, VirtualObjectProperty } from './virtual-property'
 
-export const isIndexProp = (prop: Path) =>
+export const isIndexProp = (prop: Path): prop is `${number}` =>
   prop !== EMPTY_VALUE && Number.isInteger(Number(prop))
 
-export const isListProp = (prop: Path) =>
+export const isListProp = (prop: Path): prop is `listOf` =>
   prop !== EMPTY_VALUE && prop === 'listOf'
 
-export const isInlineFragmentProp = (prop: Path) =>
+export const isInlineFragmentProp = (prop: Path): prop is `on` =>
   prop !== EMPTY_VALUE && prop === 'on'
 
-export const isParamProp = (prop: Path) =>
+export const isParamProp = (prop: Path): prop is `$${string}` =>
   prop !== EMPTY_VALUE && prop.charAt(0) === '$'
 
-export const isVariableProp = (prop: Path) =>
+export const isVariableProp = (prop: Path): prop is `with` =>
   prop !== EMPTY_VALUE && prop === 'with'
 
 export const parseProp = (prop: string): [string, string, string] => {
@@ -23,7 +23,7 @@ export const parseProp = (prop: string): [string, string, string] => {
 }
 
 export const getFragmentString = (type: string) => {
-  return `["... on ${type}"]`
+  return `["... on ${type}"]` as const
 }
 
 export const getArgsString = (args: object) => {
