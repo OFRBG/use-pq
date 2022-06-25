@@ -29,7 +29,7 @@ export type VirtualListInterface<T = any> = VirtualPropertyInterface<T>[] &
   ParamsAPI<T, true> &
   VirtualAPI<T>
 
-export type VirtualObjectInterface<T = any> = VirtualListInterface<T>
+export type VirtualObjectInterface<T = any> = VirtualPropertyInterface<T>
 
 type VirtualPropertyInterface<T = any> = {
   [Key in keyof T]: VirtualPropertyInterface<T>
