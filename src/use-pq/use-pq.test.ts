@@ -57,7 +57,8 @@ describe('usePq', () => {
       usePq(mock)
     )
 
-    result.current[0].field.listOf('array').forEach((entry) => {
+    const { listOf } = result.current[0].field
+    listOf('array').forEach((entry) => {
       entry.leaf.get()
     })
 
@@ -216,7 +217,9 @@ describe('usePq', () => {
 
   test('list function query parameters', async () => {
     const handleQuery = async (query) => {
-      return query ? { field: [{ subfield: 1 }, { subfield: 2 }] } : null
+      return query
+        ? { field: [{ subfield: [1, 2] }, { subfield: [3, 4] }] }
+        : null
     }
     const expectedQuery = gql`
       query {
@@ -244,7 +247,9 @@ describe('usePq', () => {
 
     expect(result).not.toBeLoading()
     expect(mock).toHaveBeenCalled()
-    expect(result.current[0].listOf(getArgField(1))[0].subfield.get()).toBe(1)
+    expect(result.current[0].listOf(getArgField(1))[0].subfield.get()).toEqual([
+      1, 2,
+    ])
     expect(result).toBeQuery(expectedQuery)
   })
 

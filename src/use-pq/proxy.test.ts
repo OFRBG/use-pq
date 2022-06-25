@@ -20,8 +20,16 @@ describe('makeProxy', () => {
   it('creates nested array proxies', () => {
     const proxy = joinArray(null, 'query', () => {})
 
+    expect(proxy.listOf('virtual').value()).toBeInstanceOf(Array)
     expect(proxy.listOf('virtual')[1].leaf.path).toBe('query.virtual.leaf')
     expect(proxy.virtual.get()).toBe(null)
+  })
+
+  it('return real array proxies', () => {
+    const proxy = joinArray({ virtual: ['real', 'real'] }, 'query', () => {})
+
+    expect(proxy.listOf('virtual').value()).toBeInstanceOf(Array)
+    expect(proxy.listOf('virtual').get()).toEqual(['real', 'real'])
   })
 
   it('returns real values', () => {

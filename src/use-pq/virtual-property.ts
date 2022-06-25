@@ -25,7 +25,7 @@ export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
     implements Pick<VirtualPropertyInterface, 'path' | 'value'>
   {
     public path: string
-    #value: ResolvedValue
+    #value: ResolvedValue | VirtualProperty[]
 
     constructor(...args: any[]) {
       const { path, value } = args[0]
@@ -42,6 +42,12 @@ export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
     }
 
     value() {
+      if (this.#value instanceof Array) {
+        return this.#value.map((entry) =>
+          typeof entry === 'object' ? entry?.value() : entry ?? EMPTY_VALUE
+        )
+      }
+
       return this.#value ?? EMPTY_VALUE
     }
 

@@ -24,7 +24,7 @@ const getNestedProxy = (
   path: string,
   updateQuery: (target: VirtualProperty) => void
 ) => {
-  if (value instanceof Array) {
+  if (Array.isArray(value)) {
     return joinArray(
       value.map((entry) => joinObject(entry, path, updateQuery)),
       path,
@@ -69,12 +69,13 @@ function handlerWithEffect(
       }
 
       if (isParamProp(prop)) {
-        return (params: object) =>
-          getNestedProxy(
+        return (params: object) => {
+          return getNestedProxy(
             target.value(),
             target.path + getArgsString(params),
             updateQuery
           )
+        }
       }
 
       if (isVariableProp(prop)) {
