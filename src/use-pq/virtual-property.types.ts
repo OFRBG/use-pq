@@ -19,17 +19,24 @@ type ParamsAPI<T, A = false> = {
     : VirtualPropertyInterface<T>
 }
 
-export type VirtualPropertyInterface<T = any> = {
-  [Key in keyof T]: VirtualPropertyInterface<T>
-} & {
+type VirtualAPI<T> = {
   path: Path
   value: () => ResolvedValue<T>
   get: () => ResolvedValue<T>
+}
+
+export type VirtualListInterface<T = any> = VirtualPropertyInterface<T>[] &
+  ParamsAPI<T, true> &
+  VirtualAPI<T>
+
+export type VirtualObjectInterface<T = any> = VirtualListInterface<T>
+
+type VirtualPropertyInterface<T = any> = {
+  [Key in keyof T]: VirtualPropertyInterface<T>
 } & {
   with: (args: object) => VirtualPropertyInterface<T>
   on: (type: string) => VirtualPropertyInterface<T>
 } & {
-  [Key in keyof T as 'listOf']: (
-    field: string
-  ) => VirtualPropertyInterface<T>[] & ParamsAPI<T, true>
-} & ParamsAPI<T>
+  [Key in keyof T as 'listOf']: (field: string) => VirtualListInterface<T>
+} & ParamsAPI<T> &
+  VirtualAPI<T>

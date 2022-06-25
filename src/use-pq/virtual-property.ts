@@ -1,6 +1,6 @@
 import {
   Constructor,
-  VirtualPropertyInterface,
+  VirtualObjectInterface,
   ResolvedValue,
   EMPTY_VALUE,
 } from './virtual-property.types'
@@ -8,7 +8,7 @@ import {
 export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
   class VirtualProperty
     extends Base
-    implements Pick<VirtualPropertyInterface, 'path' | 'value'>
+    implements Pick<VirtualObjectInterface, 'path' | 'value'>
   {
     public path: string
     #value: ResolvedValue | VirtualProperty[]
