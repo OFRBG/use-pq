@@ -13,8 +13,8 @@ describe('makeProxy', () => {
   it('creates nested proxies', () => {
     const proxy = joinObject(null, 'query', () => {})
 
-    expect(proxy.virtual.path).toBe('query.virtual')
-    expect(proxy.virtual.get()).toBe(null)
+    expect(proxy.virtual.subproperty.path).toBe('query.virtual.subproperty')
+    expect(proxy.virtual.subproperty.get()).toBe(null)
   })
 
   it('creates nested array proxies', () => {

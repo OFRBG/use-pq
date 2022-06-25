@@ -1,23 +1,9 @@
-export const EMPTY_VALUE: null = null
-
-export type Constructor<T = {}> = new (...args: any[]) => T
-
-export type Path = string | typeof EMPTY_VALUE
-
-export type ResolvedValue =
-  | ResolvedValue[]
-  | { [key: string]: ResolvedValue }
-  | string
-  | number
-  | null
-
-export type VirtualPropertyInterface = {
-  [key: string]: any
-} & {
-  path: Path
-  value: () => ResolvedValue
-  get: () => ResolvedValue
-}
+import {
+  Constructor,
+  VirtualPropertyInterface,
+  ResolvedValue,
+  EMPTY_VALUE,
+} from './virtual-property.types'
 
 export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
   class VirtualProperty

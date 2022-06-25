@@ -7,7 +7,8 @@ import {
 } from 'react'
 import set from 'lodash.set'
 import { joinObject } from './proxy'
-import { VirtualProperty, VirtualPropertyInterface } from './virtual-property'
+import { VirtualProperty } from './virtual-property'
+import { VirtualPropertyInterface } from './virtual-property.types'
 
 const parseQuery = (q: object) => {
   const json = JSON.stringify(q, null, 2)
@@ -38,16 +39,16 @@ const updateQuery =
 
 export type QueryHandler<T> = (query: string) => Promise<T>
 
-export type UsePqReturn<T = unknown> = [
+export type UsePqReturn<T> = [
   VirtualPropertyInterface,
   string,
   { bindData: (data: T) => void; commitQuery: () => void; isLoading: boolean }
 ]
 
-export function usePq<T = unknown>(handler?: QueryHandler<T>): UsePqReturn {
+export function usePq<T = any>(handler?: QueryHandler<T>): UsePqReturn<T> {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
-  const [proxy, setProxy] = useState<VirtualPropertyInterface>(
+  const [proxy, setProxy] = useState(
     joinObject(null, 'query', updateQuery(queryRef))
   )
   const [data, setData] = useState(null)

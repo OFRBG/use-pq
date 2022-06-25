@@ -1,4 +1,5 @@
-import { EMPTY_VALUE, Path, VirtualObjectProperty } from './virtual-property'
+import { VirtualObjectProperty } from './virtual-property'
+import { Path, EMPTY_VALUE } from './virtual-property.types'
 
 export const isIndexProp = (prop: Path): prop is `${number}` =>
   prop !== EMPTY_VALUE && Number.isInteger(Number(prop))

@@ -7,7 +7,8 @@
     "moduleResolution": "node",
     "target": "ES6",
     "allowSyntheticDefaultImports": true,
-    "types": ["@testing-library/jest-dom", "vitest/globals"]
+    "types": ["@testing-library/jest-dom", "vitest/globals"],
+    "jsx": "react"
   },
   "include": ["src"]
 }

@@ -10,17 +10,19 @@ import {
   parseProp,
 } from './property'
 import {
-  Constructor,
-  Path,
-  ResolvedValue,
   VirtualArrayProperty,
   VirtualObjectProperty,
   VirtualProperty,
-  VirtualPropertyInterface,
 } from './virtual-property'
+import type {
+  ResolvedValue,
+  Constructor,
+  Path,
+  VirtualPropertyInterface,
+} from './virtual-property.types'
 
 const getNestedProxy = (
-  value: ResolvedValue | ResolvedValue[],
+  value: ResolvedValue,
   path: string,
   updateQuery: (target: VirtualProperty) => void
 ) => {
@@ -122,7 +124,14 @@ export const join =
   ): VirtualPropertyInterface => {
     const vo = new VirtualProperty({ value, path })
 
-    return new Proxy<VirtualProperty>(vo, handlerWithEffect(updateQuery))
+    // VirtualPropertyInterface is a superset of any keys
+    // over VirtualProperty. Encoding that into the class
+    // does not seem possible without triggering compilation
+    // errors.
+    return new Proxy<VirtualPropertyInterface>(
+      vo as any,
+      handlerWithEffect(updateQuery) as any
+    )
   }
 
 export const joinObject = join(VirtualObjectProperty)
