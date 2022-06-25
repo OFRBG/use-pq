@@ -106,7 +106,10 @@ describe('usePq in render', () => {
         return (
           <>
             <span data-testid="target">
-              {p.a.$({ c }).b_.map(({ c }) => c)}
+              {p.a
+                .$({ c })
+                .listOf('b')
+                .map(({ c }) => c)}
             </span>
             <button data-testid="button" onClick={() => setC(c + 1)}></button>
           </>

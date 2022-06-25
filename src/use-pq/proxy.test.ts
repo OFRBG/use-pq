@@ -20,7 +20,7 @@ describe('makeProxy', () => {
   it('creates nested array proxies', () => {
     const proxy = joinArray(null, 'query', () => {})
 
-    expect(proxy.virtual_[1].leaf.path).toBe('query.virtual.leaf')
+    expect(proxy.listOf('virtual')[1].leaf.path).toBe('query.virtual.leaf')
     expect(proxy.virtual.get()).toBe(null)
   })
 

@@ -51,8 +51,9 @@ describe('testers', () => {
   })
 
   test('isListProp', () => {
-    expect(isListProp('field')).toBe(false)
-    expect(isListProp('field_')).toBe(true)
+    expect(isListProp('list')).toBe(false)
+    expect(isListProp('field_')).toBe(false)
+    expect(isListProp('listOf')).toBe(true)
   })
 
   test('isParamProp', () => {

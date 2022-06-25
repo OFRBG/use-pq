@@ -4,7 +4,7 @@ export const isIndexProp = (prop: Path) =>
   prop !== EMPTY_VALUE && Number.isInteger(Number(prop))
 
 export const isListProp = (prop: Path) =>
-  prop !== EMPTY_VALUE && prop.charAt(prop.length - 1) === '_'
+  prop !== EMPTY_VALUE && prop === 'listOf'
 
 export const isInlineFragmentProp = (prop: Path) =>
   prop !== EMPTY_VALUE && prop === 'on'

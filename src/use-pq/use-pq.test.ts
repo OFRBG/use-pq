@@ -8,7 +8,6 @@ describe('usePq', () => {
   })
 
   const getArgField = (id: string | number) => `field(id: "${id}", first: 2)`
-  const makeFieldArray = (field: string) => field + '_'
 
   test('field fetching', async () => {
     const handleQuery = async (query) => {
@@ -58,7 +57,7 @@ describe('usePq', () => {
       usePq(mock)
     )
 
-    result.current[0].field.array_.forEach((entry) => {
+    result.current[0].field.listOf('array').forEach((entry) => {
       entry.leaf.get()
     })
 
@@ -68,7 +67,7 @@ describe('usePq', () => {
 
     expect(result).not.toBeLoading()
     expect(mock).toHaveBeenCalled()
-    expect(result.current[0].field.array_[0].leaf.get()).toBe('1')
+    expect(result.current[0].field.listOf('array')[0].leaf.get()).toBe('1')
     expect(result).toBeQuery(expectedQuery)
   })
 
@@ -106,9 +105,12 @@ describe('usePq', () => {
 
     result.current[0].field.isTree.get()
     result.current[0].field.on('Forest').subfield.get()
-    result.current[0].field.on('Tree').subfield_.forEach((entry) => {
-      entry.leaf.get()
-    })
+    result.current[0].field
+      .on('Tree')
+      .listOf('subfield')
+      .forEach((entry) => {
+        entry.leaf.get()
+      })
 
     rerender()
     expect(result).toBeLoading()
@@ -116,7 +118,7 @@ describe('usePq', () => {
 
     expect(result).not.toBeLoading()
     expect(mock).toHaveBeenCalled()
-    expect(result.current[0].field.subfield_[0].leaf.get()).toBe('1')
+    expect(result.current[0].field.listOf('subfield')[0].leaf.get()).toBe('1')
     expect(result.current[0].field.isTree.get()).toBe(false)
     expect(result).toBeQuery(expectedQuery)
   })
@@ -198,9 +200,9 @@ describe('usePq', () => {
       usePq(mock)
     )
 
-    result.current[0][makeFieldArray(getArgField(1))].forEach((entry) =>
-      entry.subfield.get()
-    )
+    result.current[0]
+      .listOf(getArgField(1))
+      .forEach((entry) => entry.subfield.get())
 
     rerender()
     expect(result).toBeLoading()
@@ -208,9 +210,7 @@ describe('usePq', () => {
 
     expect(result).not.toBeLoading()
     expect(mock).toHaveBeenCalled()
-    expect(
-      result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
-    ).toBe(1)
+    expect(result.current[0].listOf(getArgField(1))[0].subfield.get()).toBe(1)
     expect(result).toBeQuery(expectedQuery)
   })
 
@@ -231,9 +231,12 @@ describe('usePq', () => {
       usePq(mock)
     )
 
-    result.current[0].field.$params_({ id: '1', first: 2 }).forEach((entry) => {
-      entry.subfield.get()
-    })
+    result.current[0]
+      .listOf('field')
+      .$params({ id: '1', first: 2 })
+      .forEach((entry) => {
+        entry.subfield.get()
+      })
 
     rerender()
     expect(result).toBeLoading()
@@ -241,9 +244,7 @@ describe('usePq', () => {
 
     expect(result).not.toBeLoading()
     expect(mock).toHaveBeenCalled()
-    expect(
-      result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
-    ).toBe(1)
+    expect(result.current[0].listOf(getArgField(1))[0].subfield.get()).toBe(1)
     expect(result).toBeQuery(expectedQuery)
   })
 
@@ -275,9 +276,7 @@ describe('usePq', () => {
 
     expect(result).not.toBeLoading()
     expect(mock).toHaveBeenCalled()
-    expect(
-      result.current[0][makeFieldArray(getArgField(1))][0].subfield.get()
-    ).toBe(1)
+    expect(result.current[0].listOf(getArgField(1))[0].subfield.get()).toBe(1)
     expect(result).toBeQuery(expectedQuery)
   })
 
@@ -308,7 +307,7 @@ describe('usePq', () => {
       usePq(mock)
     )
 
-    result.current[0][makeFieldArray(getArgField('first'))].forEach((entry) => {
+    result.current[0].listOf(getArgField('first')).forEach((entry) => {
       entry.meta.id.get()
       entry.subfield.get()
     })
@@ -321,12 +320,10 @@ describe('usePq', () => {
     expect(result).toBeLoading()
     await waitForNextUpdate()
 
-    result.current[0][makeFieldArray(getArgField('second'))].forEach(
-      (entry) => {
-        entry.meta.id.get()
-        entry.subfield.get()
-      }
-    )
+    result.current[0].listOf(getArgField('second')).forEach((entry) => {
+      entry.meta.id.get()
+      entry.subfield.get()
+    })
 
     rerender()
 
@@ -335,7 +332,7 @@ describe('usePq', () => {
     )
     expect(result).toBeLoading()
     expect(
-      result.current[0][makeFieldArray(getArgField('second'))][0].subfield.get()
+      result.current[0].listOf(getArgField('second'))[0].subfield.get()
     ).toBeNull()
     await waitForNextUpdate()
 
@@ -362,7 +359,7 @@ describe('usePq', () => {
     const mock = vi.fn().mockImplementation(handleQuery)
     const { result, waitForNextUpdate } = renderHook(() => usePq(mock))
 
-    result.current[0][makeFieldArray(getArgField('first'))].forEach((entry) => {
+    result.current[0].listOf(getArgField('first')).forEach((entry) => {
       entry.meta.id.get()
       entry.subfield.get()
     })
@@ -375,12 +372,10 @@ describe('usePq', () => {
 
     await waitForNextUpdate()
 
-    result.current[0][makeFieldArray(getArgField('second'))].forEach(
-      (entry) => {
-        entry.meta.id.get()
-        entry.subfield.get()
-      }
-    )
+    result.current[0].listOf(getArgField('second')).forEach((entry) => {
+      entry.meta.id.get()
+      entry.subfield.get()
+    })
     result.current[2].commitQuery()
 
     expect(mock).toHaveBeenLastCalledWith(
@@ -388,7 +383,7 @@ describe('usePq', () => {
     )
     expect(result).toBeLoading()
     expect(
-      result.current[0][makeFieldArray(getArgField('second'))][0].subfield.get()
+      result.current[0].listOf(getArgField('second'))[0].subfield.get()
     ).toBeNull()
 
     await waitForNextUpdate()

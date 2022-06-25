@@ -20,24 +20,19 @@ import {
 } from './virtual-property'
 
 const getNestedProxy = (
-  prop: string,
   value: ResolvedValue | ResolvedValue[],
   path: string,
   updateQuery: (target: VirtualProperty) => void
 ) => {
-  if (isListProp(prop)) {
-    return value && (value as ResolvedValue[]).length > 0
-      ? joinArray(
-          (value as ResolvedValue[]).map((entry) =>
-            joinObject(entry, path, updateQuery)
-          ),
-          path,
-          updateQuery
-        )
-      : joinArray([joinObject(undefined, path, updateQuery)], path, updateQuery)
+  if (value instanceof Array) {
+    return joinArray(
+      value.map((entry) => joinObject(entry, path, updateQuery)),
+      path,
+      updateQuery
+    )
   }
 
-  return joinObject(value as ResolvedValue, path, updateQuery)
+  return joinObject(value, path, updateQuery)
 }
 
 function handlerWithEffect(
@@ -70,13 +65,12 @@ function handlerWithEffect(
       const path = `${target.path}.${parsedProp}`
 
       if (isIndexProp(prop)) {
-        return getNestedProxy(prop, target.value(), target.path, updateQuery)
+        return getNestedProxy(target.value(), target.path, updateQuery)
       }
 
       if (isParamProp(prop)) {
         return (params: object) =>
           getNestedProxy(
-            prop,
             target.value(),
             target.path + getArgsString(params),
             updateQuery
@@ -86,7 +80,6 @@ function handlerWithEffect(
       if (isVariableProp(prop)) {
         return (params: object) =>
           getNestedProxy(
-            prop,
             target.value(),
             target.path + getVariablesString(params),
             updateQuery
@@ -96,14 +89,26 @@ function handlerWithEffect(
       if (isInlineFragmentProp(prop)) {
         return (type: string) =>
           getNestedProxy(
-            prop,
             target.value(),
             target.path + getFragmentString(type),
             updateQuery
           )
       }
 
-      return getNestedProxy(prop, requestedValue, path + params, updateQuery)
+      if (isListProp(prop)) {
+        return (field: string) => {
+          const [parsedProp] = parseProp(field)
+          const requestedValue = target.value()?.[parsedProp]
+
+          return getNestedProxy(
+            requestedValue?.length ? requestedValue : [undefined],
+            target.path + `.${field}`,
+            updateQuery
+          )
+        }
+      }
+
+      return getNestedProxy(requestedValue, path + params, updateQuery)
     },
   }
 }

@@ -67,6 +67,8 @@
 
 Building a query per page seems to me like patching RESTful thinking into GraphQL. The idea behind `usePq` is to do with query declarations and instead use observables to build the _exact_ query that you need, just as GraphQL was meant to be used.
 
+_To view the full documentation, go to [use-pq.com](https://use-pq.com)._
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Package Details
@@ -152,14 +154,14 @@ const [p, q, { isLoading, commitQuery }] = usePq(handler)
 
 ### Lists of fields
 
-Lists of fields cannot be access by themselves. It is possible to declare a field as a field list by appending an `_` to its key.
+Lists of fields cannot be access by themselves. It is possible to declare a field as a field list by accessing `.listOf('fieldName')` on the parent.
 
 ```tsx
 export function Users() {
   const [p, q, { isLoading }] = usePq(handler)
 
   // users is a plain array
-  const users = p.users_
+  const users = p.listOf('users')
 
   // On the first render, pq will capture the values
   // used by the component by with list having a
@@ -216,9 +218,9 @@ Combining the argument and list notation will return an array.
 export function UsersLimit({ limit }) {
   const [p, q, { isLoading }] = usePq(handler)
 
-  const users = p[`users(limit: ${limit})_`].map(
-    ({ id, name }) => `${id}: ${name}`
-  )
+  const users = p
+    .listOf(`users(limit: ${limit})`)
+    .map(({ id, name }) => `${id}: ${name}`)
 
   return (
     <div>
@@ -234,7 +236,7 @@ export function UsersLimit({ limit }) {
 
 ### Arguments as a function
 
-It is possible to provide arguments without string interpolation by using a `$` prefix after the field that needs arguments. If the field is a list, the array `_` prefix needs to be moved from the field name to the `$` key.
+It is possible to provide arguments without string interpolation by using a `$` prefix after the field that needs arguments.
 
 ```tsx
 export function User({ id }) {
@@ -260,16 +262,18 @@ export function User({ id }) {
 
 ### Fields with arguments as functions
 
-Arguments as function can also be used for list fields, with a difference compared to bracket notation arrays. In this case, the array `_` prefix needs to be moved from the field name to the `$` key.
+Arguments as function can also be used for list fields.
 
 ```tsx
 export function Users() {
   const [p, q, { isLoading }] = usePq(handler)
 
   // The function name can be anything
-  // as long as the first character is $ and
-  // the last is _
-  const users = p.users.$_({ limit }).map(({ id, name }) => `${id}: ${name}`)
+  // as long as the first character is $
+  const users = p
+    .listOf('users')
+    .$({ limit })
+    .map(({ id, name }) => `${id}: ${name}`)
 
   return (
     <div>
