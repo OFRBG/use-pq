@@ -18,7 +18,7 @@ import type {
   ResolvedValue,
   Constructor,
   Path,
-  VirtualPropertyInterface,
+  VirtualObjectInterface,
 } from './virtual-property.types'
 
 const getNestedProxy = (
@@ -117,18 +117,16 @@ function handlerWithEffect(
 
 export const join =
   (VirtualProperty: Constructor<VirtualProperty> = VirtualObjectProperty) =>
-  (
+  <T = any>(
     value: ResolvedValue,
     path: Path,
     updateQuery: (target: VirtualProperty) => void
-  ): VirtualPropertyInterface => {
+  ): VirtualObjectInterface<T> => {
     const vo = new VirtualProperty({ value, path })
 
-    // VirtualPropertyInterface is a superset of any keys
-    // over VirtualProperty. Encoding that into the class
-    // does not seem possible without triggering compilation
-    // errors.
-    return new Proxy<VirtualPropertyInterface>(
+    // This needs to be figured out and make the external type
+    // compatible with the internal class.
+    return new Proxy<VirtualObjectInterface<T>>(
       vo as any,
       handlerWithEffect(updateQuery) as any
     )
