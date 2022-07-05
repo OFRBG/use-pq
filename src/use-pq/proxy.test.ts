@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
 import { joinArray, joinObject } from './proxy'
-import { VirtualObjectProperty } from './virtual-property'
+import { VirtualArrayProperty, VirtualObjectProperty } from './virtual-property'
 
 describe('makeProxy', () => {
   it('sets a simple object', () => {
@@ -20,16 +20,31 @@ describe('makeProxy', () => {
   it('creates nested array proxies', () => {
     const proxy = joinArray(null, 'query', () => {})
 
+    expect(proxy.listOf('virtual')).toBeInstanceOf(VirtualArrayProperty)
     expect(proxy.listOf('virtual').value()).toBeInstanceOf(Array)
-    expect(proxy.listOf('virtual')[1].leaf.path).toBe('query.virtual.leaf')
+    expect(proxy.listOf('virtual')[1].branch.leaf.path).toBe(
+      'query.virtual.branch.leaf'
+    )
     expect(proxy.virtual.get()).toBe(null)
   })
 
   it('return real array proxies', () => {
     const proxy = joinArray({ virtual: ['real', 'real'] }, 'query', () => {})
 
+    expect(proxy.virtual).toBeInstanceOf(VirtualArrayProperty)
+    expect(proxy.virtual.get()).toEqual(['real', 'real'])
+  })
+
+  it('return real nested array proxies', () => {
+    const proxy = joinArray(
+      { virtual: [{ field: 'real' }, { field: 'real' }] },
+      'query',
+      () => {}
+    )
+
     expect(proxy.listOf('virtual').value()).toBeInstanceOf(Array)
-    expect(proxy.listOf('virtual').get()).toEqual(['real', 'real'])
+    expect(proxy.listOf('virtual')).toBeInstanceOf(VirtualArrayProperty)
+    expect(proxy.listOf('virtual')[0]).toBeInstanceOf(VirtualObjectProperty)
   })
 
   it('returns real values', () => {

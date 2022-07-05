@@ -117,7 +117,7 @@ function handlerWithEffect(
 
 export const join =
   (VirtualProperty: Constructor<VirtualProperty> = VirtualObjectProperty) =>
-  <T = any>(
+  <T = unknown>(
     value: ResolvedValue,
     path: Path,
     updateQuery: (target: VirtualProperty) => void
