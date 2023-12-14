@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "use-pq",
-  "extends": "@tsconfig/esm/tsconfig.json",
   "compilerOptions": {
     "lib": ["DOM", "ES6"],
     "moduleResolution": "node",
