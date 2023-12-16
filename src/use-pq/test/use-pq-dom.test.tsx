@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 
 import React, { useEffect, useState } from 'react'
 import { screen, render, waitFor } from '@testing-library/react'
-import { usePq } from './use-pq'
+import { usePq } from '../use-pq'
 import { act } from '@testing-library/react'
 
 const PqProvider = ({ handler, Child }) => {

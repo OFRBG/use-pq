@@ -12,7 +12,7 @@ type ListKeys<T> = keyof {
   [K in keyof T as T[K] extends Array<object> ? K : never]: any
 }
 
-export type ResolvedValue<T = any> =
+export type ResolvedValue<T = unknown> =
   | T
   | ResolvedValue<T>[]
   | { [key: string]: ResolvedValue<T> }
@@ -63,8 +63,8 @@ type VirtualAPI<T> = {
 } & (T extends Primitive | Primitive[]
   ? { get: () => ResolvedValue<T> }
   : T extends object
-  ? {}
-  : { get: () => ResolvedValue<T> })
+    ? {}
+    : { get: () => ResolvedValue<T> })
 
 type NestedVirtualProperties<T> = T extends Primitive | object
   ? { [Key in keyof Omit<T, ListKeys<T>>]: VirtualObjectInterface<T[Key]> }

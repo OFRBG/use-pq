@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react-hooks'
 import { gql } from 'urql'
-import { usePq } from './use-pq'
+import { usePq } from '../use-pq'
 
 describe('usePq', () => {
   afterEach(() => {
@@ -57,8 +57,9 @@ describe('usePq', () => {
       usePq(mock)
     )
 
-    const { listOf } = result.current[0].field
-    listOf('array').forEach((entry) => {
+    const array = result.current[0].field.listOf('array')
+
+    array.forEach((entry) => {
       entry.leaf.get()
     })
 
@@ -319,6 +320,7 @@ describe('usePq', () => {
 
     rerender()
 
+    console.log(result.current[1])
     expect(mock).toHaveBeenLastCalledWith(
       expect.stringContaining(getArgField('first'))
     )

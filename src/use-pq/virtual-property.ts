@@ -1,75 +1,98 @@
-import {
-  Constructor,
-  VirtualObjectInterface,
-  ResolvedValue,
-  EMPTY_VALUE,
-} from './virtual-property.types'
+import { EMPTY_VALUE, ResolvedValue } from './virtual-property.types'
 
-export const VirtualProperty = <TBase extends Constructor>(Base: TBase) =>
-  class VirtualProperty
-    extends Base
-    implements Pick<VirtualObjectInterface, 'path' | 'value'>
-  {
-    public path: string
-    #value: ResolvedValue | VirtualProperty[]
+interface VirtualClass<T> {
+  name: string
+  value(): T
+}
 
-    constructor(...args: any[]) {
-      const { path, value } = args[0]
+export class VirtualObject<T extends ResolvedValue>
+  extends Object
+  implements VirtualClass<T>
+{
+  name: string = 'VirtualObject'
 
-      super(...(Array.isArray(value) ? value : []))
+  constructor(public property: { path: string; value: T }) {
+    super(property.value)
+  }
 
-      this.path = path
-      this.#value = value
-      this.value = this.value.bind(this)
-    }
+  value(): T {
+    return this.property.value ?? EMPTY_VALUE
+  }
 
-    get() {
-      return this.value()
-    }
+  get() {
+    return this.value()
+  }
 
-    value() {
-      if (this.#value instanceof Array) {
-        return this.#value.map((entry) =>
-          typeof entry === 'object' ? entry?.value() : entry ?? EMPTY_VALUE
-        )
-      }
+  [Symbol.name]() {
+    return this.name
+  }
 
-      return this.#value ?? EMPTY_VALUE
-    }
+  [Symbol.toStringTag]() {
+    return this.name
+  }
 
-    #name() {
-      return `Virtual${Base.name}Property`
-    }
+  [Symbol.toPrimitive]() {
+    return this.value()
+  }
 
-    [Symbol.name]() {
-      return this.#name
-    }
+  *[Symbol.iterator]() {
+    yield this.value()
+  }
 
-    [Symbol.toStringTag]() {
-      return this.#name
-    }
+  toString() {
+    return this.value()?.toString() || ''
+  }
+}
 
-    [Symbol.toPrimitive]() {
-      return this.value()
-    }
+export class VirtualArray<
+    T extends VirtualProperty<ResolvedValue> | ResolvedValue,
+  >
+  extends Array
+  implements VirtualClass<T[]>
+{
+  name: string = 'VirtualArray'
 
-    *[Symbol.iterator]() {
-      yield this.value()
-    }
+  constructor(public property: { path: string; value: T[] }) {
+    super()
 
-    toString() {
-      return this.value().toString()
+    if (!Array.isArray(property.value)) return
+
+    for (const item of property.value) {
+      this.push(item)
     }
   }
 
-export const VirtualObjectProperty = VirtualProperty(Object)
-export const VirtualArrayProperty = VirtualProperty(Array)
+  value(): T[] {
+    return this.property.value.map((entry) => {
+      return entry instanceof VirtualObject
+        ? entry?.value()
+        : entry ?? EMPTY_VALUE
+    })
+  }
 
-const _vo = new VirtualObjectProperty({})
-const _va = new VirtualArrayProperty({})
+  get() {
+    return this.value()
+  }
 
-export type VirtualObjectPropertyType = typeof _vo
-export type VirtualArrayPropertyType = typeof _va
-export type VirtualProperty =
-  | VirtualObjectPropertyType
-  | VirtualArrayPropertyType
+  [Symbol.name]() {
+    return this.name
+  }
+
+  [Symbol.toStringTag]() {
+    return this.name
+  }
+
+  *[Symbol.iterator]() {
+    const value = this.value()
+
+    for (let i = 0; i < value.length; i++) {
+      yield value[i]
+    }
+  }
+
+  toString() {
+    return this.value().toString()
+  }
+}
+
+export type VirtualProperty<T> = VirtualObject<T> | VirtualArray<T>

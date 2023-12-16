@@ -3,7 +3,10 @@ import { TypedDocumentNode, gql } from 'urql'
 import { UsePqReturn } from './use-pq/use-pq'
 
 expect.extend({
-  toBeQuery(received: RenderResult<UsePqReturn>, query: TypedDocumentNode) {
+  toBeQuery(
+    received: RenderResult<UsePqReturn<any>>,
+    query: TypedDocumentNode
+  ) {
     if (this.equals(gql(received.current[1]), query)) {
       return {
         message: () => `expected queries not to match`,
@@ -20,7 +23,7 @@ expect.extend({
       }
     }
   },
-  toBeLoading(received: RenderResult<UsePqReturn>) {
+  toBeLoading(received: RenderResult<UsePqReturn<any>>) {
     const pass = received.current[2].isLoading
 
     if (pass) {

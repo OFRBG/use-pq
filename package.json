@@ -31,7 +31,8 @@
     "build-fast": "tsup src/index.ts --format cjs,esm",
     "build": "pnpm build-fast --dts-resolve",
     "test": "vitest",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "lodash.set": "^4.3.2"
@@ -48,7 +49,6 @@
     "@types/lodash.get": "^4.4.7",
     "@types/lodash.set": "^4.3.7",
     "@types/react": "17",
-    "@vitest/ui": "^1.0.4",
     "c8": "^8.0.1",
     "graphql": "^16.5.0",
     "husky": "^8.0.1",
@@ -61,6 +61,6 @@
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
     "urql": "^4.0.6",
-    "vitest": "^1.0.4"
+    "vitest": "^0.34.6"
   }
 }

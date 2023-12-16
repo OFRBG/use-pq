@@ -10,127 +10,129 @@ import {
   parseProp,
 } from './property'
 import {
-  VirtualArrayProperty,
-  VirtualObjectProperty,
+  VirtualArray,
+  VirtualObject,
   VirtualProperty,
 } from './virtual-property'
 import type {
   ResolvedValue,
-  Constructor,
   Path,
   VirtualObjectInterface,
 } from './virtual-property.types'
 
-const getNestedProxy = (
-  value: ResolvedValue,
+const getNestedProxy = <T>(
+  value: ResolvedValue<T>,
   path: string,
-  updateQuery: (target: VirtualProperty) => void
+  updateQuery: (target: unknown) => void
 ) => {
   if (Array.isArray(value)) {
-    return joinArray(
-      value.map((entry) => joinObject(entry, path, updateQuery)),
-      path,
-      updateQuery
+    const wrappedValues = value.map((entry) =>
+      createObjectProxy(entry, path, updateQuery)
     )
+
+    return createArrayProxy(wrappedValues, path, updateQuery)
   }
 
-  return joinObject(value, path, updateQuery)
+  return createObjectProxy(value, path, updateQuery)
 }
 
-function handlerWithEffect(
-  updateQuery: (target: VirtualProperty) => void
-): ProxyHandler<VirtualProperty> {
+function proxyHandler<T extends VirtualProperty<any>>(
+  updateQuery: (target: T) => void
+): ProxyHandler<T> {
   return {
-    get: function (parent, prop) {
+    get: function (object, property) {
       if (
-        prop === 'get' ||
-        prop === Symbol.toPrimitive ||
-        prop === Symbol.iterator
+        property === 'get' ||
+        property === 'toString' ||
+        property === Symbol.toPrimitive ||
+        property === Symbol.iterator
       ) {
-        updateQuery(parent)
+        updateQuery(object)
       }
 
-      if (prop === 'get') {
-        return parent.value
+      if (property in object) {
+        return Reflect.get(object, property)
       }
 
-      if (prop in parent) {
-        return parent[prop]
-      }
-
-      if (typeof prop === 'symbol') {
+      if (typeof property === 'symbol') {
         throw new Error('Symbol query paths are not supported.')
       }
 
-      if (isIndexProp(prop)) {
-        return getNestedProxy(parent.value(), parent.path, updateQuery)
+      if (isIndexProp(property)) {
+        return getNestedProxy(
+          object.value()[property],
+          object.property.path,
+          updateQuery
+        )
       }
 
-      if (isParamProp(prop)) {
+      if (isParamProp(property)) {
         return (params: object) =>
           getNestedProxy(
-            parent.value(),
-            parent.path + getArgsString(params),
+            object.value(),
+            object.property.path + getArgsString(params),
             updateQuery
           )
       }
 
-      if (isVariableProp(prop)) {
+      if (isVariableProp(property)) {
         return (params: object) =>
           getNestedProxy(
-            parent.value(),
-            parent.path + getVariablesString(params),
+            object.value(),
+            object.property.path + getVariablesString(params),
             updateQuery
           )
       }
 
-      if (isInlineFragmentProp(prop)) {
+      if (isInlineFragmentProp(property)) {
         return (type: string) =>
           getNestedProxy(
-            parent.value(),
-            parent.path + getFragmentString(type),
+            object.value(),
+            object.property.path + getFragmentString(type),
             updateQuery
           )
       }
 
-      if (isListProp(prop)) {
+      if (isListProp(property)) {
         return (field: string) => {
-          const [parsedProp] = parseProp(field)
-          const requestedValue = parent.value()?.[parsedProp]
+          const { queryProp } = parseProp(field)
+          const requestedValue = object.value()?.[queryProp]
 
           return getNestedProxy(
             requestedValue?.length ? requestedValue : [undefined],
-            parent.path + `.${field}`,
+            `${object.property.path}.${field}`,
             updateQuery
           )
         }
       }
 
-      const [parsedProp, params] = parseProp(prop)
-      const requestedValue = parent.value()?.[parsedProp]
-      const path = `${parent.path}.${parsedProp}`
+      const { queryProp, params } = parseProp(property)
+      const requestedValue = object.value()?.[queryProp]
+      const path = `${object.property.path}.${queryProp}`
 
       return getNestedProxy(requestedValue, path + params, updateQuery)
     },
   }
 }
 
-export const join =
-  (VirtualProperty: Constructor<VirtualProperty> = VirtualObjectProperty) =>
-  <T = unknown>(
-    value: ResolvedValue,
-    path: Path,
-    updateQuery: (target: VirtualProperty) => void
-  ): VirtualObjectInterface<T> => {
-    const vo = new VirtualProperty({ value, path })
+export const createObjectProxy = <T>(
+  value: ResolvedValue<T>,
+  path: Path,
+  updateQuery: (target: VirtualObject<ResolvedValue<T>>) => void
+) => {
+  const virtualValue = new VirtualObject({ value, path })
+  const handler = proxyHandler(updateQuery)
 
-    // This needs to be figured out and make the external type
-    // compatible with the internal class.
-    return new Proxy<VirtualObjectInterface<T>>(
-      vo as any,
-      handlerWithEffect(updateQuery) as any
-    )
-  }
+  return new Proxy(virtualValue, handler)
+}
 
-export const joinObject = join(VirtualObjectProperty)
-export const joinArray = join(VirtualArrayProperty)
+export const createArrayProxy = <T>(
+  value: ResolvedValue<T>[],
+  path: Path,
+  updateQuery: (target: VirtualArray<T>) => void
+) => {
+  const virtualValue = new VirtualArray({ value, path })
+  const handler = proxyHandler(updateQuery)
+
+  return new Proxy(virtualValue, handler)
+}

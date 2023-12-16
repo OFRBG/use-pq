@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react'
 import set from 'lodash.set'
-import { joinObject } from './proxy'
+import { createObjectProxy } from './proxy'
 import { VirtualProperty } from './virtual-property'
 import { VirtualObjectInterface } from './virtual-property.types'
 
@@ -21,20 +21,23 @@ const parseQuery = (q: object) => {
     .slice(2, -2)
 }
 
-const getRootField = ({ query = {} }) => Reflect.ownKeys(query)[0]
+const getRootField = ({ query = {} }) => {
+  return Reflect.ownKeys(query)[0]
+}
 
 const updateQuery =
-  (query: MutableRefObject<{ query?: any }>) => (target: VirtualProperty) => {
-    if (!target.path) return
+  <T>(query: MutableRefObject<{ query?: any }>) =>
+  (target: VirtualProperty<T>) => {
+    if (!target.property.path) return
 
-    const incomingRootField = getRootField(set({}, target.path, '?'))
+    const incomingRootField = getRootField(set({}, target.property.path, '?'))
     const currentRootField = getRootField(query.current)
 
     if (incomingRootField !== currentRootField) {
       query.current = {}
     }
 
-    set(query.current, target.path, '#')
+    set(query.current, target.property.path, '#')
   }
 
 export type QueryHandler<T> = (query: string) => Promise<T>
@@ -42,14 +45,14 @@ export type QueryHandler<T> = (query: string) => Promise<T>
 export type UsePqReturn<T> = [
   VirtualObjectInterface<T>,
   string,
-  { bindData: (data: T) => void; commitQuery: () => void; isLoading: boolean }
+  { bindData: (data: T) => void; commitQuery: () => void; isLoading: boolean },
 ]
 
 export function usePq<T = unknown>(handler?: QueryHandler<T>): UsePqReturn<T> {
   const queryRef = useRef({})
   const [query, setQuery] = useState('')
   const [proxy, setProxy] = useState(
-    joinObject<T>(null, 'query', updateQuery(queryRef))
+    createObjectProxy<T>(null, 'query', updateQuery(queryRef))
   )
   const [data, setData] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -73,7 +76,7 @@ export function usePq<T = unknown>(handler?: QueryHandler<T>): UsePqReturn<T> {
   }, [handler, query])
 
   useEffect(() => {
-    setProxy(joinObject<T>(data, 'query', updateQuery(queryRef)))
+    setProxy(createObjectProxy<T>(data, 'query', updateQuery(queryRef)))
   }, [data, query])
 
   return [proxy, query, { commitQuery, isLoading, bindData: setData }]

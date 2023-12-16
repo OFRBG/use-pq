@@ -1,4 +1,4 @@
-import { VirtualObjectProperty } from './virtual-property'
+import { VirtualObject } from './virtual-property'
 import { Path, EMPTY_VALUE } from './virtual-property.types'
 
 export const isIndexProp = (prop: Path): prop is `${number}` =>
@@ -16,11 +16,11 @@ export const isParamProp = (prop: Path): prop is `$${string}` =>
 export const isVariableProp = (prop: Path): prop is `with` =>
   prop !== EMPTY_VALUE && prop === 'with'
 
-export const parseProp = (prop: string): [string, string, string] => {
+export const parseProp = (prop: string) => {
   const queryProp = prop.replace(/\s|\(.*\)|_$/gm, '')
   const params = prop.match(/\((.*)\)/)?.[0] || ''
 
-  return [queryProp, params, '']
+  return { queryProp, params }
 }
 
 export const getFragmentString = (type: string) => {
@@ -42,7 +42,7 @@ export const getArgsString = (args: object) => {
         argString += args[key]
         break
       case 'object':
-        if (args[key] instanceof VirtualObjectProperty) {
+        if (args[key] instanceof VirtualObject) {
           argString += JSON.stringify(args[key].get())
           break
         } else {
